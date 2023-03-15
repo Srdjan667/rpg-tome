@@ -1,0 +1,7 @@
+{% extends 'item_library/base.html' %}
+{% block content %}
+	<div class="container m-4">
+		<h4 class="title is-4">You have been successfuly logged out.</h4>
+		<small><a href="{% url 'account:login' %}">Log in again</a></small>
+	</div>
+{% endblock content %}
