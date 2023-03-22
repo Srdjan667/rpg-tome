@@ -5,7 +5,7 @@ from django.core.validators import MinValueValidator
 
 class CreateItemForm(ModelForm):
 	title = forms.CharField(
-		widget=forms.TextInput(attrs={'placeholder': 'Enter title here'})
+		widget=forms.TextInput(attrs={'placeholder': 'Enter title here', 'autofocus':True})
 		)
 
 	description = forms.CharField(
