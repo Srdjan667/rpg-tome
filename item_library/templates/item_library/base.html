@@ -39,9 +39,9 @@
 	        </a>
 	        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
 	          <a class="dropdown-item" href="{% url 'item_library:index' %}">Newest</a>
-	          <a class="dropdown-item" href="{% url 'item_library:index' %}?q=date_created">Oldest</a>
-	          <a class="dropdown-item" href="{% url 'item_library:index' %}?q=title">Title</a>
-	          <a class="dropdown-item" href="{% url 'item_library:index' %}?q=rarity">Rarity</a>
+	          <a class="dropdown-item" href="{% url 'item_library:index' %}?order=date_created">Oldest</a>
+	          <a class="dropdown-item" href="{% url 'item_library:index' %}?order=title">Title</a>
+	          <a class="dropdown-item" href="{% url 'item_library:index' %}?order=rarity">Rarity</a>
 	          <div class="dropdown-divider"></div>
 	          <a class="dropdown-item" href="#">Something else here</a>
 	        </div>

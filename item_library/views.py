@@ -6,18 +6,15 @@ from .forms import CreateItemForm
 from django.views.generic import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-from django.http import HttpResponse
-
-SORT_CRITERIA = ['-date_created', 'date_created', 'title', 'rarity']
-
 
 @login_required
 def index(request):
-	date = request.GET.get('q', None)
-	if date == None:
+	order = request.GET.get('order', None)
+	try:
+		items = Item.objects.filter(author=request.user.id).order_by(order)
+	except:
 		items = Item.objects.filter(author=request.user.id).order_by('-date_created')
-	else:
-		items = Item.objects.filter(author=request.user.id).order_by(date)
+		
 	context = {
 	'items': items
 	}
@@ -41,4 +38,3 @@ def new_item(request):
 class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 	model = Item
 	success_url = '/'
-
