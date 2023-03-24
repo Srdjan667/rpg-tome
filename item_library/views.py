@@ -10,16 +10,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 @login_required
 def index(request):
 	order = request.GET.get('order', None)
+	user_id = request.session.get('_auth_user_id')
 	try:
-		items = Item.objects.filter(author=request.user.id).order_by(order)
+		items = Item.objects.filter(author=user_id).order_by(order)
 
 		request.session['order'] = order
 		request.session.save()
 	except:
 		try:
-			items = Item.objects.filter(author=request.user.id).order_by(request.session.get('order'))
+			items = Item.objects.filter(author=user_id).order_by(request.session.get('order'))
 		except:
-			items = Item.objects.filter(author=request.user.id).order_by('-date_created')
+			items = Item.objects.filter(author=user_id).order_by('-date_created')
 
 	context = {
 	'items': items
@@ -29,11 +30,12 @@ def index(request):
 
 @login_required
 def new_item(request):
+	user_id = request.session.get('_auth_user_id')
 	if request.method == 'POST':
 		form = CreateItemForm(request.POST)
 		if form.is_valid():
 			item = form.save(commit=False)
-			item.author = request.user
+			item.author = user_id
 			item.save()
 			return redirect('item_library:index')
 	else:
@@ -48,4 +50,11 @@ class ItemDetailView(LoginRequiredMixin, DetailView):
 
 class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 	model = Item
+	context_object_name = 'item'
 	success_url = '/'
+
+	def test_func(self):
+		post = self.get_object()
+		if self.request.user == post.author:
+			return True
+		return True
