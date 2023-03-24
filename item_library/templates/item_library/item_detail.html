@@ -1,0 +1,16 @@
+{% extends 'item_library/base.html' %} 
+{% load static %} 
+{% block content %}
+<div class="container mt-3">
+  <div class="list-group">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ item.title }}</h5>
+      <small>{{ item.get_rarity_display }}</small>
+    </div>
+    <p class="mb-1">{{ item.description }}</p>
+    <small>{{ item.date_created }}</small>
+    <small>Value: {{ item.value }}</small>
+  </div>
+</div>
+{% endblock content %}
+

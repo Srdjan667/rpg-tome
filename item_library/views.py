@@ -3,7 +3,7 @@ from .models import Item
 from django.contrib.auth.decorators import login_required
 from django import forms
 from .forms import CreateItemForm
-from django.views.generic import DeleteView
+from django.views.generic import DetailView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
@@ -12,9 +12,15 @@ def index(request):
 	order = request.GET.get('order', None)
 	try:
 		items = Item.objects.filter(author=request.user.id).order_by(order)
+
+		request.session['order'] = order
+		request.session.save()
 	except:
-		items = Item.objects.filter(author=request.user.id).order_by('-date_created')
-		
+		try:
+			items = Item.objects.filter(author=request.user.id).order_by(request.session.get('order'))
+		except:
+			items = Item.objects.filter(author=request.user.id).order_by('-date_created')
+
 	context = {
 	'items': items
 	}
@@ -33,6 +39,11 @@ def new_item(request):
 	else:
 		form = CreateItemForm()
 	return render(request, 'item_library/new.html', {'form':form})
+
+
+class ItemDetailView(LoginRequiredMixin, DetailView):
+	model = Item
+	template_name = 'item_library/item_detail.html'
 
 
 class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):

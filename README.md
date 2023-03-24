@@ -38,3 +38,4 @@ For now there are only few features, which are:
 3. Index page where you can view your items
 4. Ability to create your own items
 5. Ability to sort items
+6. ABility to view individual item in greater detail
