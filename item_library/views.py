@@ -3,7 +3,7 @@ from .models import Item
 from django.contrib.auth.decorators import login_required
 from django import forms
 from .forms import CreateItemForm
-from django.views.generic import DetailView, DeleteView
+from django.views.generic import DetailView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
@@ -35,7 +35,7 @@ def new_item(request):
 		form = CreateItemForm(request.POST)
 		if form.is_valid():
 			item = form.save(commit=False)
-			item.author = user_id
+			item.author = request.user
 			item.save()
 			return redirect('item_library:index')
 	else:
@@ -46,6 +46,22 @@ def new_item(request):
 class ItemDetailView(LoginRequiredMixin, DetailView):
 	model = Item
 	template_name = 'item_library/item_detail.html'
+
+
+class ItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+	model = Item
+	form_class = CreateItemForm
+	success_url = '/'
+
+	def form_valid(self, form):
+		form.instance.author = self.request.user
+		return super().form_valid(form)
+
+	def test_func(self):
+		post = self.get_object()
+		if self.request.user == post.author:
+			return True
+		return False
 
 
 class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
