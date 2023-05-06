@@ -40,3 +40,4 @@ For now there are only few features, which are:
 5. Ability to sort items
 6. Ability to view individual item in greater detail
 7. Delete items
+8. Filtering
