@@ -84,9 +84,10 @@ def index(request):
 
 	context = {
 	'items': items,
-	'filter_entry': filter_entry,
-	'rarity_list': rarity_list,
 	}
+
+	request.session["filter_entry"] = filter_entry
+	request.session["rarity_list"] = rarity_list
 
 	return render(request, "item_library/index.html", context)
 
