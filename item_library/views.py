@@ -11,6 +11,7 @@ from operator import or_
 
 RARITIES = ['common', 'uncommon', 'rare', 'very rare', 'legendary']
 
+@login_required
 def order_items(request, items):
 	order = request.GET.get('order', None)
 	try:
@@ -27,6 +28,7 @@ def order_items(request, items):
 	return items
 
 
+@login_required
 def filter_items(request):
 	user_id = request.user
 	items = Item.objects.filter(author=user_id)
@@ -50,10 +52,15 @@ def filter_items(request):
 	return items
 
 
+# Make sure filter is applied after creating new item
 @login_required
 def index(request):
 	rarity_list = []
 	filter_entry = {}
+
+	for i in range(len(RARITIES)):
+		rarity_list.append({"is_checked": request.POST.get(RARITIES[i])})
+		rarity_list[i]['rarity'] = RARITIES[i]
 
 	if request.method == 'POST':
 		if 'filter' in request.POST:
@@ -66,15 +73,14 @@ def index(request):
 
 		elif 'reset' in request.POST:
 			items = Item.objects.filter(author=request.user)
+			
+			for r in range(len(rarity_list)):
+				rarity_list[r]['is_checked'] = None
 
 	else:
 		items = Item.objects.filter(author=request.user)
 
 	items = order_items(request, items)
-
-	for i in range(len(RARITIES)):
-		rarity_list.append({"is_checked": request.POST.get(RARITIES[i])})
-		rarity_list[i]['rarity'] = RARITIES[i]
 
 	context = {
 	'items': items,
