@@ -9,16 +9,26 @@ from django.db.models import Q
 from functools import reduce
 from operator import or_
 
+FILTERS = ["title", "min_value", "max_value"]
 RARITIES = ['common', 'uncommon', 'rare', 'very rare', 'legendary']
+
+
+@login_required
+def check_for_session_errors(request):
+	# sets empty strings as a default values to avoid KeyError
+	for i in range(len(FILTERS)):
+		request.session.setdefault(FILTERS[i], '')
+
+	request.session.setdefault('rarity_list', '')
+	request.session.setdefault('filter_entry', '')
+
 
 @login_required
 def order_items(request, items):
 	order = request.GET.get('order', None)
 	try:
 		items = items.order_by(order)
-
 		request.session['order'] = order
-		request.session.save()
 	except:
 		try:
 			items = items.order_by(request.session.get('order'))
@@ -32,17 +42,25 @@ def order_items(request, items):
 def filter_items(request):
 	user_id = request.user
 	items = Item.objects.filter(author=user_id)
+	template_filters = {}
 
-	title = request.POST.get('title')
-	min_value = request.POST.get('min_value')
-	max_value = request.POST.get('max_value')
+	if request.method == "POST":
+		for i in range(len(FILTERS)):
+			template_filters[FILTERS[i]] = request.POST.get(FILTERS[i])
 
-	if title != "":
-		items = items.filter(title__icontains=title)
-	if min_value != "":
-		items = items.filter(value__gte=min_value)
-	if max_value != "":
-		items = items.filter(value__lte=max_value)
+	else:
+		for i in range(len(FILTERS)):
+			template_filters[FILTERS[i]] = request.session[FILTERS[i]]
+
+	if template_filters["title"]:
+		items = items.filter(title__icontains=template_filters["title"])
+		request.session["title"] = template_filters["title"]
+	if template_filters["min_value"]:
+		items = items.filter(value__gte=template_filters["min_value"])
+		request.session["min_value"] = template_filters["min_value"]
+	if template_filters["max_value"]:
+		items = items.filter(value__lte=template_filters["max_value"])
+		request.session["max_value"] = template_filters["max_value"]
 
 	rarity_filters = [Q(rarity=request.POST.get(r, None)) for r in RARITIES if request.POST.get(r, None)]
 
@@ -52,11 +70,12 @@ def filter_items(request):
 	return items
 
 
-# Make sure filter is applied after creating new item
 @login_required
 def index(request):
 	rarity_list = []
 	filter_entry = {}
+
+	check_for_session_errors(request)
 
 	for i in range(len(RARITIES)):
 		rarity_list.append({"is_checked": request.POST.get(RARITIES[i])})
@@ -66,28 +85,31 @@ def index(request):
 		if 'filter' in request.POST:
 			items = filter_items(request)
 
-			filters = ["title", "min_value", "max_value"]
-
-			for i in range(len(filters)):
-				filter_entry[filters[i]] = request.POST.get(filters[i])
+			for i in range(len(FILTERS)):
+				filter_entry[FILTERS[i]] = request.POST.get(FILTERS[i])
 
 		elif 'reset' in request.POST:
 			items = Item.objects.filter(author=request.user)
-			
-			for r in range(len(rarity_list)):
-				rarity_list[r]['is_checked'] = None
+
+			for i in range(len(rarity_list)):
+				rarity_list[i]['is_checked'] = None
+
+			for i in range(len(FILTERS)):
+				request.session[FILTERS[i]] = None
 
 	else:
-		items = Item.objects.filter(author=request.user)
+		items = filter_items(request)
+
+	if request.session["filter_entry"] != filter_entry:
+		request.session["filter_entry"] = filter_entry
+	if request.session["rarity_list"] != rarity_list:
+		request.session["rarity_list"] = rarity_list
 
 	items = order_items(request, items)
 
 	context = {
 	'items': items,
 	}
-
-	request.session["filter_entry"] = filter_entry
-	request.session["rarity_list"] = rarity_list
 
 	return render(request, "item_library/index.html", context)
 
@@ -103,6 +125,7 @@ def new_item(request):
 			return redirect('item_library:index')
 	else:
 		form = CreateItemForm()
+
 	return render(request, 'item_library/new.html', {'form':form})
 
 

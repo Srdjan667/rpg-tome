@@ -39,7 +39,7 @@
               Sort by
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{% url 'item_library:index' %}">Newest
+              <a class="dropdown-item" href="{% url 'item_library:index' %}?order=-date_created">Newest
               </a>
               <a class="dropdown-item" href="{% url 'item_library:index' %}?order=date_created">Oldest
               </a>
