@@ -25,15 +25,21 @@ def check_for_session_errors(request):
 
 @login_required
 def order_items(request, items):
-	order = request.GET.get('order', None)
+	ordering_direction = {"asc":"-", "desc":""}
+
+	# adds "order" in the session if not already present, to avoid future errors
 	try:
-		items = items.order_by(order)
-		request.session['order'] = order
-	except:
-		try:
-			items = items.order_by(request.session.get('order'))
-		except:
-			items = items.order_by('-date_created')
+		request.session["order"]
+	except (KeyError, ValueError):
+		request.session["order"] = "date_created"
+
+	order = request.GET.get('order', request.session["order"])
+
+	order_direction = ordering_direction[request.GET.get("direction", "desc")]
+
+	# combines ordering direction with ordering criteria
+	items = items.order_by(order_direction + order)
+	request.session['order'] = order
 
 	return items
 
@@ -82,12 +88,14 @@ def index(request):
 		rarity_list[i]['rarity'] = RARITIES[i]
 
 	if request.method == 'POST':
+		# saves user input so it can be filled from the session
 		if 'filter' in request.POST:
 			items = filter_items(request)
 
 			for i in range(len(FILTERS)):
 				filter_entry[FILTERS[i]] = request.POST.get(FILTERS[i])
 
+		# clears all previously filled fields
 		elif 'reset' in request.POST:
 			items = Item.objects.filter(author=request.user)
 

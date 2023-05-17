@@ -39,9 +39,7 @@
               Sort by
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{% url 'item_library:index' %}?order=-date_created">Newest
-              </a>
-              <a class="dropdown-item" href="{% url 'item_library:index' %}?order=date_created">Oldest
+              <a class="dropdown-item" href="{% url 'item_library:index' %}?order=date_created">Date Created
               </a>
               <a class="dropdown-item" href="{% url 'item_library:index' %}?order=title">Title
               </a>
@@ -51,7 +49,9 @@
               </a>
               <div class="dropdown-divider">
               </div>
-              <a class="dropdown-item" href="#">Something else here
+              <a class="dropdown-item" href="{% url 'item_library:index' %}?order={{ request.session.order }}&direction=asc">Ascending
+              </a>
+              <a class="dropdown-item" href="{% url 'item_library:index' %}?order={{ request.session.order }}&direction=desc">Descending                
               </a>
             </div>
           </li>
