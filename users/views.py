@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-# from django.contrib import messages
+from django.contrib import messages
 from .forms import UserRegisterForm, CustomLoginForm
 from django.contrib.auth.views import *
 from django.urls import reverse_lazy
@@ -10,14 +10,12 @@ def CustomRegisterView(request):
 		if form.is_valid():
 			form.save()
 			username = form.cleaned_data.get('username')
-			# messages.success(request, f"Account has been created for {username}! You may now login.")
+			messages.success(request, f"Account has been created for {username}, you may now login.")
 			return redirect('account:login')
 	else:
 		form = UserRegisterForm()
 	return render(request, 'users/register.html', {'form':form})
-
-
-# Add success message for new user
+	
 
 class CustomLoginView(LoginView):
 	form_class = CustomLoginForm

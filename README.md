@@ -18,7 +18,7 @@ After that you should be able to see webpage in your browser by entering the fol
     localhost:8000/
 
 Every time you make a change and save a file, refresh the browser and change will show up.
-In rare cases when your change don't show up immediately, just restart the server by pressing CTRL C and run the server again.
+In rare cases when your change don't show up immediately, just restart the server by pressing CTRL-C and run the server again.
 
 You know your server is running succesfully when text similar to the one below appears:
 
@@ -41,3 +41,4 @@ For now there are only few features, which are:
 6. Ability to view individual item in greater detail
 7. Delete items
 8. Filtering
+9. Reseting password from login page
