@@ -25,29 +25,35 @@ def check_for_session_errors(request):
 
 @login_required
 def order_items(request, items):
-	ordering_direction = {"asc":"-", "desc":""}
+	direction_mapping = {"asc":"", "desc":"-"}
 
-	# adds "order" in the session if not already present, to avoid future errors
-	try:
-		request.session["order"]
-	except (KeyError, ValueError):
-		request.session["order"] = "date_created"
+	# adds default "order" and "direction" if not already present, to avoid future errors
+	request.session.setdefault("order", "date_created")
+	request.session.setdefault("direction", "desc")
 
-	order = request.GET.get('order', request.session["order"])
+	order = request.GET.get("order", request.session["order"])
 
-	order_direction = ordering_direction[request.GET.get("direction", "desc")]
+	# uses URL parameter if avaiable, if not session is used instead
+	order_direction = request.GET.get("direction", request.session["direction"])
 
-	# combines ordering direction with ordering criteria
+	if order_direction is None:
+		order_direction = "desc"
+
+	order_direction = direction_mapping[order_direction]
+
+	# combines direction_mapping with ordering criteria
 	items = items.order_by(order_direction + order)
-	request.session['order'] = order
+	request.session["order"] = order
+
+	if request.session["direction"] != request.GET.get("direction"):
+		request.session["direction"] = request.GET.get("direction")
 
 	return items
 
 
 @login_required
 def filter_items(request):
-	user_id = request.user
-	items = Item.objects.filter(author=user_id)
+	items = Item.objects.filter(author=request.user)
 	template_filters = {}
 
 	if request.method == "POST":
