@@ -15,7 +15,7 @@
         <input type="number" class="form-control" max="9999999999" placeholder="Max value" name="max_value" {% if request.session.filter_entry.max_value %}value={{request.session.filter_entry.max_value}}{% endif %}>
       </div>
     </div>
-    <div class="form-row mb-4">
+    <div class="form-row">
       {% for entry in request.session.rarity_list %}
       <div class="form-group mr-2">
         <div class="form-check">
@@ -35,6 +35,19 @@
       </div>
     </div>
   </form>
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+      <div class="alert alert-success" role="alert">
+        {{ message }}
+      </div>
+      {% else %}
+      <div class="alert alert-danger" role="alert">
+        {{ message }}
+      </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 </div>
 <div class="row">
   <div class="container">

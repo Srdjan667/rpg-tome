@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
-from .models import Item
-from django.contrib.auth.decorators import login_required
-from django import forms
-from .forms import CreateItemForm
+from django.utils import timezone
 from django.views.generic import DetailView, UpdateView, DeleteView
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib import messages
 from django.db.models import Q
+from django import forms
+from .models import Item
+from .forms import CreateItemForm
 from functools import reduce
 from operator import or_
 
@@ -14,26 +16,25 @@ RARITIES = ['common', 'uncommon', 'rare', 'very rare', 'legendary']
 
 
 @login_required
-def check_for_session_errors(request):
-	# sets empty strings as a default values to avoid KeyError
-	for i in range(len(FILTERS)):
-		request.session.setdefault(FILTERS[i], '')
+def initialize_session(request):
+	# Sets empty strings as a default values to avoid KeyError
+	for i in FILTERS:
+		request.session.setdefault(i, '')
 
 	request.session.setdefault('rarity_list', '')
 	request.session.setdefault('filter_entry', '')
+
+	request.session.setdefault("order", "date_created")
+	request.session.setdefault("direction", "desc")
 
 
 @login_required
 def order_items(request, items):
 	direction_mapping = {"asc":"", "desc":"-"}
 
-	# adds default "order" and "direction" if not already present, to avoid future errors
-	request.session.setdefault("order", "date_created")
-	request.session.setdefault("direction", "desc")
-
 	order = request.GET.get("order", request.session["order"])
 
-	# uses URL parameter if avaiable, if not session is used instead
+	# Uses URL parameter if avaiable, if not session is used instead
 	order_direction = request.GET.get("direction", request.session["direction"])
 
 	if order_direction is None:
@@ -41,7 +42,7 @@ def order_items(request, items):
 
 	order_direction = direction_mapping[order_direction]
 
-	# combines direction_mapping with ordering criteria
+	# Combines direction_mapping with ordering criteria
 	items = items.order_by(order_direction + order)
 	request.session["order"] = order
 
@@ -53,16 +54,18 @@ def order_items(request, items):
 
 @login_required
 def filter_items(request):
-	items = Item.objects.filter(author=request.user)
+	items = Item.objects.filter(
+            	author=request.user, 
+	            date_created__lte=timezone.now())
+
 	template_filters = {}
 
 	if request.method == "POST":
-		for i in range(len(FILTERS)):
-			template_filters[FILTERS[i]] = request.POST.get(FILTERS[i])
-
+		for i in FILTERS:
+			template_filters[i] = request.POST.get(i)
 	else:
-		for i in range(len(FILTERS)):
-			template_filters[FILTERS[i]] = request.session[FILTERS[i]]
+		for i in FILTERS:
+			template_filters[i] = request.session[i]
 
 	if template_filters["title"]:
 		items = items.filter(title__icontains=template_filters["title"])
@@ -74,7 +77,9 @@ def filter_items(request):
 		items = items.filter(value__lte=template_filters["max_value"])
 		request.session["max_value"] = template_filters["max_value"]
 
-	rarity_filters = [Q(rarity=request.POST.get(r, None)) for r in RARITIES if request.POST.get(r, None)]
+	rarity_filters = [Q(
+		rarity=request.POST.get(r, None)) 
+		for r in RARITIES if request.POST.get(r, None)]
 
 	if rarity_filters:
 		items = items.filter(reduce(or_, rarity_filters))
@@ -87,29 +92,32 @@ def index(request):
 	rarity_list = []
 	filter_entry = {}
 
-	check_for_session_errors(request)
+	initialize_session(request)
 
+	# For each rarity check whether is checkbox active or not
 	for i in range(len(RARITIES)):
 		rarity_list.append({"is_checked": request.POST.get(RARITIES[i])})
 		rarity_list[i]['rarity'] = RARITIES[i]
 
 	if request.method == 'POST':
-		# saves user input so it can be filled from the session
+		# Saves user input so it can be filled from the session
 		if 'filter' in request.POST:
 			items = filter_items(request)
 
-			for i in range(len(FILTERS)):
-				filter_entry[FILTERS[i]] = request.POST.get(FILTERS[i])
+			for i in FILTERS:
+				filter_entry[i] = request.POST.get(i)
 
-		# clears all previously filled fields
+		# Clears all previously filled fields
 		elif 'reset' in request.POST:
-			items = Item.objects.filter(author=request.user)
+			items = Item.objects.filter(
+            	author=request.user, 
+	            date_created__lte=timezone.now())
 
 			for i in range(len(rarity_list)):
 				rarity_list[i]['is_checked'] = None
 
-			for i in range(len(FILTERS)):
-				request.session[FILTERS[i]] = None
+			for i in FILTERS:
+				request.session[i] = None
 
 	else:
 		items = filter_items(request)
@@ -132,11 +140,17 @@ def index(request):
 def new_item(request):
 	if request.method == 'POST':
 		form = CreateItemForm(request.POST)
+		# If everything is fine, show success message
 		if form.is_valid():
 			item = form.save(commit=False)
 			item.author = request.user
 			item.save()
-			return redirect('item_library:index')
+			messages.success(request, f"Item successfully created")
+		# Return error
+		else:
+			messages.error(request, f"Item is not valid")
+
+		return redirect('item_library:index')
 	else:
 		form = CreateItemForm()
 
@@ -158,8 +172,8 @@ class ItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 		return super().form_valid(form)
 
 	def test_func(self):
-		post = self.get_object()
-		if self.request.user == post.author:
+		entry = self.get_object()
+		if self.request.user == entry.author:
 			return True
 		return False
 
@@ -170,7 +184,7 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 	success_url = '/'
 
 	def test_func(self):
-		post = self.get_object()
-		if self.request.user == post.author:
+		entry = self.get_object()
+		if self.request.user == entry.author:
 			return True
-		return True
+		return False

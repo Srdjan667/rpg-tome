@@ -10,7 +10,8 @@ def CustomRegisterView(request):
 		if form.is_valid():
 			form.save()
 			username = form.cleaned_data.get('username')
-			messages.success(request, f"Account has been created for {username}, you may now login.")
+			messages.success(request,
+				f"Account has been created for {username}, you may now login.")
 			return redirect('account:login')
 	else:
 		form = UserRegisterForm()
