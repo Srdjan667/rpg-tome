@@ -3,9 +3,9 @@ Run the following commands to install:
 
 ## Requirements
 
-    python (from https://www.python.org/downloads/)
-    pip install django
-    pip install widget_tweaks
+    python 3.7 or greater
+    
+    pip install -r requirements.txt
 
 ## Development server
 After installing requirements, run the testing server:
