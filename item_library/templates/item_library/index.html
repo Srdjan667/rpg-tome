@@ -1,3 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Source Project</title>
+  <link rel="stylesheet" href="/item_library/css/main.css">
+</head>
+<body>
+  
 {% extends 'item_library/base.html' %}
 {% load static %}
 {% block content %}
@@ -28,9 +38,9 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <button type="submit" name="filter" class="btn btn-primary">Filter
+        <button type="submit" name="filter" id="btn" class="btn btn-primary">Filter
         </button>
-        <button type="submit" name="reset" class="btn btn-primary">Reset
+        <button type="submit" name="reset" id="btn" class="btn btn-primary">Reset
         </button>
       </div>
     </div>
@@ -72,3 +82,5 @@
   </div>
 </div>
 {% endblock content %}
+</body>
+</html>
