@@ -15,10 +15,10 @@ urlpatterns = [
 		LogoutView.as_view(), name='logout'),
 
 	path('password_change/', 
-		CustomPasswordResetView.as_view(), name='password_change'),
+		CustomPasswordChangeView.as_view(), name='password_change'),
 
 	path('password_change/done/', 
-		CustomPasswordResetView.as_view(), name='password_change_done'),
+		PasswordChangeDoneView.as_view(), name='password_change_done'),
 
 	path('password_reset/', 
 		CustomPasswordResetView.as_view(), name='password_reset'),

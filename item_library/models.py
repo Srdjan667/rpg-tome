@@ -1,9 +1,11 @@
-from django.db import models
-from django.utils import timezone
 from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
+from django.db import models
 from django.urls import reverse
+from django.utils import timezone
+
 
 class Item(models.Model):
     """
@@ -30,12 +32,15 @@ class Item(models.Model):
     description = models.TextField()
     value = models.PositiveIntegerField(default=0)
     rarity = models.PositiveSmallIntegerField(
+                default=COMMON,
                 choices=RARITIES, 
-                validators=[MaxValueValidator(len(RARITIES))])
+                validators=[MaxValueValidator(len(RARITIES))],
+    )
 
     date_created = models.DateTimeField(default=timezone.now)
     last_modified = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
     def was_published_recently(self):
         now = timezone.now()
@@ -44,7 +49,6 @@ class Item(models.Model):
     def was_modified_recently(self):
         now = timezone.now()
         return now - timedelta(days=1) <= self.last_modified <= now
-
 
     def __str__(self):
         return self.title

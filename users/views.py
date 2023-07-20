@@ -23,6 +23,10 @@ class CustomLoginView(LoginView):
 	template_name='users/login.html'
 
 
+class CustomPasswordChangeView(PasswordChangeView):
+	success_url = reverse_lazy("account:password_change_done")
+
+
 class CustomPasswordResetView(PasswordResetView):
 	email_template_name = "registration/password_reset_email.html"
 	success_url = reverse_lazy("account:password_reset_done")

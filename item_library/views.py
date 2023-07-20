@@ -1,34 +1,43 @@
-from django.shortcuts import render, redirect
-from django.utils import timezone
-from django.views.generic import DetailView, UpdateView, DeleteView
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib import messages
-from django.db.models import Q
-from django import forms
-from .models import Item
-from .forms import CreateItemForm
 from functools import reduce
 from operator import or_
 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required
+from django.views.generic import DetailView, UpdateView, DeleteView
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.utils import timezone
+from django import forms
+
+from .forms import CreateItemForm
+from .models import Item
+
+
 FILTERS = ["title", "min_value", "max_value"]
 RARITIES = ['common', 'uncommon', 'rare', 'very rare', 'legendary']
+DEFAULT_SESSION_KEYS = {"rarity_list": "", 
+						"filter_entry": "", 
+						"order": "date_created", 
+						"direction": "desc"}
 
 
-@login_required
 def initialize_session(request):
 	# Sets empty strings as a default values to avoid KeyError
 	for i in FILTERS:
 		request.session.setdefault(i, '')
 
-	request.session.setdefault('rarity_list', '')
-	request.session.setdefault('filter_entry', '')
+	for k, v in DEFAULT_SESSION_KEYS.items():
+		request.session.setdefault(k, v)
 
-	request.session.setdefault("order", "date_created")
-	request.session.setdefault("direction", "desc")
+	# request.session.setdefault('rarity_list', '')
+	# request.session.setdefault('filter_entry', '')
+
+	# request.session.setdefault("order", "date_created")
+	# request.session.setdefault("direction", "desc")
 
 
-@login_required
 def order_items(request, items):
 	direction_mapping = {"asc":"", "desc":"-"}
 
@@ -52,7 +61,6 @@ def order_items(request, items):
 	return items
 
 
-@login_required
 def filter_items(request):
 	items = Item.objects.filter(
             	author=request.user, 
@@ -129,8 +137,12 @@ def index(request):
 
 	items = order_items(request, items)
 
+	paginator = Paginator(items, 10)
+	page_number = request.GET.get("page")
+	page_obj = paginator.get_page(page_number)
+
 	context = {
-	'items': items,
+	'page_obj': page_obj
 	}
 
 	return render(request, "item_library/index.html", context)

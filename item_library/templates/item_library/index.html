@@ -20,7 +20,7 @@
       <div class="form-group mr-2">
         <div class="form-check">
           <input class="form-check-input" type="checkbox" name="{{entry.rarity}}" value={{forloop.counter}} {% if entry.is_checked %}checked{% endif %}>
-          <label for="{{entry.rarity}}">{{entry.rarity|title}}
+          <label for="{{entry.rarity}}">{{ entry.rarity|title }}
           </label>
         </div>
       </div>
@@ -52,7 +52,7 @@
 <div class="row">
   <div class="container">
     <div class="list-group">
-      {% for item in items %}
+      {% for item in page_obj %}
       <a href="{% url 'item_library:item-detail' item.id %}" class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">{{ item.title }}
@@ -69,6 +69,25 @@
       </a>
       {% endfor %}
     </div>
+
+    <div class="paginated">
+      <span class="step-links">
+        {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?{{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+      </span>
+
+      <span class="current">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      </span>
+
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">next</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+    </div>
+
   </div>
 </div>
 {% endblock content %}
