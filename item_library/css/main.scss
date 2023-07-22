@@ -1,0 +1,29 @@
+$margin: 5px;
+$padding: 15px;
+
+body {
+    background-color: #EBCE2A;
+    color: black;
+    padding: $padding;
+}
+
+.container {
+    text-align: center;
+}
+
+.form-control {
+    width: 30%;
+    margin: $margin;
+    padding: 5px;
+}
+
+.form-check-input {
+    margin-top: $padding;
+}
+
+#btn {
+    margin: $padding $padding $padding $padding;
+    width: 10%;
+    height: 25px;
+
+}
