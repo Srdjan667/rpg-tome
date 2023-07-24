@@ -8,8 +8,11 @@ Run the following commands to install:
     pip install -r requirements.txt
 
 ## Development server
-After installing requirements, run the testing server:
-Navigate to project's folder and run from Command Prompt (Windows), or Terminal (Linux):
+Upon your first installation navigate to root folder (folder that contains `manage.py`) and run from Command Prompt (Windows), or Terminal (Linux):
+
+    python manage.py migrate
+
+After installing requirements, you can run the testing server from root folder:
 
     python manage.py runserver
 
