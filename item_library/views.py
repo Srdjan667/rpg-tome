@@ -31,12 +31,6 @@ def initialize_session(request):
 	for k, v in DEFAULT_SESSION_KEYS.items():
 		request.session.setdefault(k, v)
 
-	# request.session.setdefault('rarity_list', '')
-	# request.session.setdefault('filter_entry', '')
-
-	# request.session.setdefault("order", "date_created")
-	# request.session.setdefault("direction", "desc")
-
 
 def order_items(request, items):
 	direction_mapping = {"asc":"", "desc":"-"}
@@ -126,7 +120,6 @@ def index(request):
 
 			for i in FILTERS:
 				request.session[i] = None
-
 	else:
 		items = filter_items(request)
 
