@@ -1,4 +1,5 @@
 from datetime import timedelta
+from random import randint
 
 from django.contrib.auth.models import User
 from django.test import TestCase, Client
@@ -6,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from item_library.models import Item
-from item_library.views import FILTERS, DEFAULT_SESSION_KEYS
+from item_library.views import FILTERS
 
 
 class ItemLibraryViewsTest(TestCase):
@@ -65,27 +66,13 @@ class ItemLibraryViewsTest(TestCase):
         self.assertNotIn(self.future_item.title, response_content)
         self.assertNotIn(self.future_item.description, response_content)
 
-    def test_index_view_default_session_keys(self):
-        response = self.client.get(reverse('item_library:index'))
-        session_keys = self.client.session.keys()
-
-        for f in FILTERS:
-            self.assertIn(f, session_keys)
-
-        for d in DEFAULT_SESSION_KEYS.keys():
-            self.assertIn(d, self.client.session.keys())
-
-        # Make sure none of the values are checked
-        for r in self.client.session["rarity_list"]:
-            self.assertIsNone(r["is_checked"])
-
     def test_index_view_is_filter_working(self):
         form_data = {
-        "filter": "Filter",
-        "rare": "3"
+        "filter": "",
+        "rare": "on"
         }
 
-        response = self.client.post(reverse('item_library:index'), 
+        response = self.client.get(reverse('item_library:index'), 
                                     data=form_data)
         response_content = str(response.content)
 

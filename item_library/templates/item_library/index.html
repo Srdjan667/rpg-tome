@@ -1,70 +1,85 @@
-{% extends 'item_library/base.html' %}
-{% load static %}
+{% extends 'item_library/base.html' %} 
+{% load static %} 
 {% block content %}
 <div class="container">
-  <form method="POST">
-    {% csrf_token %}
+  <form method="GET">
     <div class="form-group">
-      <input type="text" class="form-control" placeholder="Title" name="title" {% if request.session.filter_entry.title %}value={{ request.session.filter_entry.title }}{% endif %}>
+      <input type="text" class="form-control" placeholder="Title" name="title" {% if request.GET.title %}value="{{ request.GET.title }}"{% endif %} />
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <input type="number" class="form-control" min="0" placeholder="Min value" name="min_value" {% if request.session.filter_entry.min_value %}value={{ request.session.filter_entry.min_value }}{% endif %}>
+        <input type="number" class="form-control" min="0" placeholder="Min value" name="min_value" {% if request.GET.min_value %}value="{{ request.GET.min_value }}"{% endif %} />
       </div>
       <div class="form-group col-md-6">
-        <input type="number" class="form-control" max="9999999999" placeholder="Max value" name="max_value" {% if request.session.filter_entry.max_value %}value={{request.session.filter_entry.max_value}}{% endif %}>
+        <input type="number" class="form-control" max="9999999999" placeholder="Max value" name="max_value" {% if request.GET.max_value %}value="{{ request.GET.max_value }}"{% endif %} />
       </div>
     </div>
     <div class="form-row">
-      {% for entry in request.session.rarity_list %}
+      <!-- Generates rarity checkboxes -->
+      {% for k, v in rarity_dict.items %}
       <div class="form-group mr-2">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="{{entry.rarity}}" value={{forloop.counter}} {% if entry.is_checked %}checked{% endif %}>
-          <label for="{{entry.rarity}}">{{ entry.rarity|title }}
-          </label>
+          <input class="form-check-input" type="checkbox" name="{{ k }}" {% if v %}checked{% endif %} />
+          <label for="{{ k }}">{{ k|title }} </label>
         </div>
       </div>
       {% endfor %}
     </div>
     <div class="form-row">
       <div class="form-group">
-        <button type="submit" name="filter" class="btn btn-primary">Filter
-        </button>
-        <button type="submit" name="reset" class="btn btn-primary">Reset
-        </button>
+      {% for k, v in sorting_dict.items %}
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="order" id="{{ k }}" value="{{ k }}" {% if v %}checked{% endif %} />
+          <label class="form-check-label" for="{{ k }}">{{ k|title }}</label>
+        </div>
+      {% endfor %}
+      </div>
+      <div class="form-group pl-5">
+        {% for k,v in sort_direction.items %}
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="direction" id="{{ k }}" value="{{ k }}" {% if v %}checked{% endif %} />
+          <label class="form-check-label" for="{{ k }}">{{ k|title }}</label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <button type="submit" name="filter" class="btn btn-primary">Filter</button>
+        <!-- Clears all previously filled fields -->
+        <a href="{% url 'item_library:index' %}">
+          <button type="button" name="reset" class="btn btn-primary">Reset</button>
+        </a>
       </div>
     </div>
   </form>
-  {% if messages %}
-    {% for message in messages %}
+  {% if messages %} 
+    {% for message in messages %} 
       {% if message.tags == 'success' %}
-      <div class="alert alert-success" role="alert">
-        {{ message }}
-      </div>
+        <div class="alert alert-success" role="alert">
+          {{ message }}
+        </div>
       {% else %}
-      <div class="alert alert-danger" role="alert">
-        {{ message }}
-      </div>
-      {% endif %}
-    {% endfor %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endif %} 
+    {% endfor %} 
   {% endif %}
 </div>
 <div class="row">
   <div class="container">
     <div class="list-group">
+      <!-- Generates list of items on current page -->
       {% for item in page_obj %}
       <a href="{% url 'item_library:item-detail' item.id %}" class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">{{ item.title }}
-          </h5>
-          <small>{{ item.get_rarity_display }}
-          </small>
+          <h5 class="mb-1">{{ item.title }}</h5>
+          <small>{{ item.get_rarity_display }} </small>
         </div>
-        <p class="mb-1">{{ item.description }}
-        </p>
+        <p class="mb-1">{{ item.description }}</p>
         <div class="d-flex w-100 justify-content-between">
-          <small>{{ item.date_created }}
-          </small>
+          <small>{{ item.date_created }} </small>
         </div>
       </a>
       {% endfor %}
@@ -73,8 +88,9 @@
     <div class="paginated">
       <span class="step-links">
         {% if page_obj.has_previous %}
-        <a href="?page=1">&laquo; first</a>
-        <a href="?{{ page_obj.previous_page_number }}">previous</a>
+        <!-- Generate correct URL, depending on if there are parameters present or not -->
+        <a href="{{ request.get_full_path }}{% if request.GET %}&{% else %}?{% endif %}page=1">&laquo; first</a>
+        <a href="{{ request.get_full_path }}{% if request.GET %}&{% else %}?{% endif %}{{ page_obj.previous_page_number }}">previous</a>
         {% endif %}
       </span>
 
@@ -83,11 +99,10 @@
       </span>
 
       {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}">next</a>
-      <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      <a href="{{ request.get_full_path }}{% if request.GET %}&{% else %}?{% endif %}page={{ page_obj.next_page_number }}">next</a>
+      <a href="{{ request.get_full_path }}{% if request.GET %}&{% else %}?{% endif %}page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
       {% endif %}
     </div>
-
   </div>
 </div>
 {% endblock content %}

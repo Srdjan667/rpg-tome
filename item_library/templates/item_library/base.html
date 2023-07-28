@@ -29,33 +29,6 @@
               </span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link
-            </a>
-          </li>
-          {% if user.is_authenticated %}
-          <li class="nav-item active dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Sort by
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="{% url 'item_library:index' %}?order=date_created{% if request.session.direction %}&direction={{ request.session.direction }}{% endif %}">Date Created
-              </a>
-              <a class="dropdown-item" href="{% url 'item_library:index' %}?order=title{% if request.session.direction %}&direction={{ request.session.direction }}{% endif %}">Title
-              </a>
-              <a class="dropdown-item" href="{% url 'item_library:index' %}?order=rarity{% if request.session.direction %}&direction={{ request.session.direction }}{% endif %}">Rarity
-              </a>
-              <a class="dropdown-item" href="{% url 'item_library:index' %}?order=value{% if request.session.direction %}&direction={{ request.session.direction }}{% endif %}">Value
-              </a>
-              <div class="dropdown-divider">
-              </div>
-              <a class="dropdown-item" href="{% url 'item_library:index' %}?order={{ request.session.order }}&direction=asc">Ascending
-              </a>
-              <a class="dropdown-item" href="{% url 'item_library:index' %}?order={{ request.session.order }}&direction=desc">Descending                
-              </a>
-            </div>
-          </li>
-          {% endif %}
         </ul>
         {% if user.is_authenticated %}
         <div class="btn-group">
