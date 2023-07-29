@@ -15,7 +15,7 @@ from .helpers import get_sort_criteria, get_sort_direction
 from .forms import CreateItemForm
 from .models import Item
 
-
+ITEMS_PER_PAGE = 10
 FILTERS = ["title", "min_value", "max_value"]
 RARITIES = {'common': 1, 
 			'uncommon': 2, 
@@ -91,7 +91,7 @@ def index(request):
 
 	items = order_items(request, items)
 
-	paginator = Paginator(items, 10)
+	paginator = Paginator(items, ITEMS_PER_PAGE)
 	page_number = request.GET.get("page")
 	page_obj = paginator.get_page(page_number)
 
