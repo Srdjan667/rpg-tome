@@ -73,16 +73,6 @@ def index(request):
 
 	if request.method == 'GET':
 		# Filter items based on GET criteria
-		if 'filter' in request.GET:
-			items = filter_items(request)
-
-		# Clears all previously filled fields
-		else:
-			items = Item.objects.filter(
-				author=request.user, 
-				date_created__lte=timezone.now())
-
-	else:
 		items = filter_items(request)
 
 	# Make a dict of all checked out rarity checkboxes
