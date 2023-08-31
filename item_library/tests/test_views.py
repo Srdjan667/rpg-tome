@@ -230,6 +230,18 @@ class ItemLibraryFilteringTest(TestCase):
         self.client.logout()
 
 
+    def fetch_items_from_database(self, **params):
+        # Fetch items from the database
+        items = Item.objects.filter(**params)
+        return [item.title for item in items]
+
+
+    def find_in_html(self, response):
+        # Find all items returned by client
+        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
+        return re.findall(pattern, response)
+
+
     def test_index_view_is_title_filter_working(self):
         form_data = {
         "filter": "",
@@ -240,17 +252,13 @@ class ItemLibraryFilteringTest(TestCase):
                                             data=form_data)
 
         # Fetch items from the database that contain title
-        items = Item.objects.filter(title__icontains=form_data["title"])
+        params = {"title__icontains": form_data["title"]}
+        items_from_database = self.fetch_items_from_database(**params)
 
-        # Make a list of those items with only their title
-        items_from_database = [item.title for item in items]
-
-        # Find all items returned by client
-        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
-        items_from_html = re.findall(pattern, response.content.decode("utf-8"))
+        html_items = self.find_in_html(response.content.decode("utf-8"))
 
         # Compare items from database with those generated in HTML
-        self.assertEqual(sorted(items_from_database), sorted(items_from_html))
+        self.assertEqual(sorted(items_from_database), sorted(html_items))
 
 
     def test_index_view_is_min_value_filter_working(self):
@@ -264,17 +272,13 @@ class ItemLibraryFilteringTest(TestCase):
 
         # Fetch items from the database whose value is equal or greater than
         # min_value
-        items = Item.objects.filter(value__gte=form_data["min_value"])
+        params = {"value__gte": form_data["min_value"]}
+        items_from_database = self.fetch_items_from_database(**params)
 
-        # Make a list of those items with only their title
-        items_from_database = [item.title for item in items]
-
-        # Find all items returned by client
-        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
-        items_from_html = re.findall(pattern, response.content.decode("utf-8"))
+        html_items = self.find_in_html(response.content.decode("utf-8"))
 
         # Compare items from database with those generated in HTML
-        self.assertEqual(sorted(items_from_database), sorted(items_from_html))
+        self.assertEqual(sorted(items_from_database), sorted(html_items))
 
 
     def test_index_view_is_max_value_filter_working(self):
@@ -288,14 +292,10 @@ class ItemLibraryFilteringTest(TestCase):
 
         # Fetch items from the database whose value is less or equal than
         # min_value
-        items = Item.objects.filter(value__lte=form_data["max_value"])
+        params = {"value__lte": form_data["max_value"]}
+        items_from_database = self.fetch_items_from_database(**params)
 
-        # Make a list of those items with only their title
-        items_from_database = [item.title for item in items]
-
-        # Find all items returned by client
-        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
-        items_from_html = re.findall(pattern, response.content.decode("utf-8"))
+        html_items = self.find_in_html(response.content.decode("utf-8"))
 
         # Compare items from database with those generated in HTML
-        self.assertEqual(sorted(items_from_database), sorted(items_from_html))
+        self.assertEqual(sorted(items_from_database), sorted(html_items))
