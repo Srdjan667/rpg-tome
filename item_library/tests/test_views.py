@@ -73,7 +73,7 @@ class ItemLibraryViewsTest(TestCase):
 
     def test_index_view_is_filter_working(self):
         form_data = {
-        "filter": "",
+        "submit": "",
         "rare": "on"
         }
 
@@ -129,7 +129,7 @@ class ItemLibrarySortingTest(TestCase):
 
         # Simulate user sorting items by the time they were created
         form_data = {
-        "filter": "",
+        "submit": "",
         "order": "date_created",
         "direction": "ascending"
         }
@@ -148,7 +148,7 @@ class ItemLibrarySortingTest(TestCase):
 
         # Simulate user sorting items by their titles
         form_data = {
-        "filter": "",
+        "submit": "",
         "order": "title",
         "direction": "ascending"
         }
@@ -167,7 +167,7 @@ class ItemLibrarySortingTest(TestCase):
 
         # Simulate user sorting items by their rarities
         form_data = {
-        "filter": "",
+        "submit": "",
         "order": "rarity",
         "direction": "ascending"
         }
@@ -186,7 +186,7 @@ class ItemLibrarySortingTest(TestCase):
 
         # Simulate user sorting items by their values
         form_data = {
-        "filter": "",
+        "submit": "",
         "order": "value",
         "direction": "ascending"
         }
@@ -244,7 +244,7 @@ class ItemLibraryFilteringTest(TestCase):
 
     def test_index_view_is_title_filter_working(self):
         form_data = {
-        "filter": "",
+        "submit": "",
         "title": "item",
         }
 
@@ -263,7 +263,7 @@ class ItemLibraryFilteringTest(TestCase):
 
     def test_index_view_is_min_value_filter_working(self):
         form_data = {
-        "filter": "",
+        "submit": "",
         "min_value": randint(1, 50000)
         }
 
@@ -283,7 +283,7 @@ class ItemLibraryFilteringTest(TestCase):
 
     def test_index_view_is_max_value_filter_working(self):
         form_data = {
-        "filter": "",
+        "submit": "",
         "max_value": randint(1, 50000)
         }
 
