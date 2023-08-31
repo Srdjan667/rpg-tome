@@ -12,7 +12,6 @@ from item_library.views import ITEMS_PER_PAGE
 
 
 class ItemLibraryViewsTest(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user("testuser", password="testing321")
@@ -112,6 +111,20 @@ class ItemLibrarySortingTest(TestCase):
         self.assertTrue(self.login_successful)
 
 
+    def fetch_items_from_database(self, order):
+        # Fetch items from the database and order them
+        items = Item.objects.all().order_by(order)
+
+        # Return a list of their titles
+        return [item.title for item in items]
+
+
+    def find_items_in_html(self, response):
+        # Find all items returned by client
+        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
+        return re.findall(pattern, response)
+
+
     def test_index_view_is_date_created_order_working(self):
 
         # Simulate user sorting items by the time they were created
@@ -124,18 +137,11 @@ class ItemLibrarySortingTest(TestCase):
         response = self.client.get(reverse('item_library:index'), 
                                             data=form_data)
 
-        # Fetch items from the database that are sorted by their dates
-        items = Item.objects.all().order_by("date_created")
-
-        # Make a list of those items with only their title
-        items_from_database = [item.title for item in items]
-
-        # Find all items returned by client
-        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
-        items_from_html = re.findall(pattern, response.content.decode("utf-8"))
+        database_items = self.fetch_items_from_database("date_created")
+        html_items = self.find_items_in_html(response.content.decode("utf-8"))
 
         # Compare items from database with those generated in HTML
-        self.assertEqual(items_from_database, items_from_html)
+        self.assertEqual(database_items, html_items)
 
 
     def test_index_view_is_title_order_working(self):
@@ -150,18 +156,11 @@ class ItemLibrarySortingTest(TestCase):
         response = self.client.get(reverse('item_library:index'), 
                                             data=form_data)
 
-        # Fetch items from the database that are sorted by their titles
-        items = Item.objects.all().order_by("title")
-
-        # Make a list of those items with only their title
-        items_from_database = [item.title for item in items]
-
-        # Find all items returned by client
-        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
-        items_from_html = re.findall(pattern, response.content.decode("utf-8"))
+        database_items = self.fetch_items_from_database("title")
+        html_items = self.find_items_in_html(response.content.decode("utf-8"))
 
         # Compare items from database with those generated in HTML
-        self.assertEqual(items_from_database, items_from_html)
+        self.assertEqual(database_items, html_items)
 
 
     def test_index_view_is_rarity_order_working(self):
@@ -176,18 +175,11 @@ class ItemLibrarySortingTest(TestCase):
         response = self.client.get(reverse('item_library:index'), 
                                             data=form_data)
 
-        # Fetch items from the database that are sorted by their rarities
-        items = Item.objects.all().order_by("rarity")
-
-        # Make a list of those items with only their title
-        items_from_database = [item.title for item in items]
-
-        # Find all items returned by client
-        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
-        items_from_html = re.findall(pattern, response.content.decode("utf-8"))
+        database_items = self.fetch_items_from_database("rarity")
+        html_items = self.find_items_in_html(response.content.decode("utf-8"))
 
         # Compare items from database with those generated in HTML
-        self.assertEqual(items_from_database, items_from_html)
+        self.assertEqual(database_items, html_items)
 
 
     def test_index_view_is_value_order_working(self):
@@ -202,18 +194,11 @@ class ItemLibrarySortingTest(TestCase):
         response = self.client.get(reverse('item_library:index'), 
                                             data=form_data)
 
-        # Fetch items from the database that are sorted by their values
-        items = Item.objects.all().order_by("value")
-
-        # Make a list of those items with only their title
-        items_from_database = [item.title for item in items]
-
-        # Find all items returned by client
-        pattern = re.compile(r"<h5 class=\"mb-1\">(.*?)</h5>")
-        items_from_html = re.findall(pattern, response.content.decode("utf-8"))
+        database_items = self.fetch_items_from_database("value")
+        html_items = self.find_items_in_html(response.content.decode("utf-8"))
 
         # Compare items from database with those generated in HTML
-        self.assertEqual(items_from_database, items_from_html)
+        self.assertEqual(database_items, html_items)
 
 
 class ItemLibraryFilteringTest(TestCase):
