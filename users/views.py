@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import UserRegisterForm, CustomLoginForm
-from django.contrib.auth.views import *
 from django.urls import reverse_lazy
+from django.contrib.auth.views import *
+
+from .forms import UserRegisterForm, CustomLoginForm
 
 def CustomRegisterView(request):
 	if request.method == 'POST':
