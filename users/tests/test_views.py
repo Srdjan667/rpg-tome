@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 
-class TestCustomRegisterForm(TestCase):
+class TestCustomRegisterView(TestCase):
 	def test_custom_register_view_status_code(self):
 		self.client = Client()
 		response = self.client.get(reverse('account:register'))
@@ -25,3 +25,26 @@ class TestCustomRegisterForm(TestCase):
 		gooduser = User.objects.get(username=data["username"])
 
 		self.assertEquals(gooduser.username, "gooduser")
+
+
+	def test_if_custom_register_view_rejects_invalid_user(self):
+		self.client = Client()
+		# Try to register without username
+		data = {"email": "good@user.com", 
+				"password1": "secret_123", 
+				"password2": "secret_123"}
+		self.client.post(reverse('account:register'), data)
+
+		self.assertEquals(User.objects.count(), 0)
+
+
+	def test_if_custom_register_view_redirects_to_login(self):
+		self.client = Client()
+		data = {"username": "baduser", 
+				"email": "bad@user.com", 
+				"password1": "secret_123", 
+				"password2": "secret_123"}
+		response = self.client.post(reverse('account:register'), data)
+
+		self.assertRedirects(response, reverse("account:login"))
+		
