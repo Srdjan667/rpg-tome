@@ -1,6 +1,6 @@
 from django.urls import reverse
 from django.contrib import auth
-from django.test import SimpleTestCase, TestCase, Client
+from django.test import TestCase, Client
 from django.contrib.auth.models import User
 
 class TestCustomRegisterView(TestCase):

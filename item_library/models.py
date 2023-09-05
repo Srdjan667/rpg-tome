@@ -1,11 +1,7 @@
-from datetime import timedelta
-
-from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator
 from django.db import models
-from django.urls import reverse
 from django.utils import timezone
-
+from django.core.validators import MaxValueValidator
+from django.contrib.auth.models import User
 
 class Item(models.Model):
     """
@@ -14,25 +10,19 @@ class Item(models.Model):
     from being inserted into the database.
     """
 
-    COMMON = 1
-    UNCOMMON = 2
-    RARE = 3
-    VERY_RARE = 4
-    LEGENDARY = 5
-
     RARITIES = (
-        (COMMON, "Common"),
-        (UNCOMMON, "Uncommon"),
-        (RARE, "Rare"),
-        (VERY_RARE, "Very Rare"),
-        (LEGENDARY, "Legendary"),
+        (1, "Common"),
+        (2, "Uncommon"),
+        (3, "Rare"),
+        (4, "Very Rare"),
+        (5, "Legendary"),
     )
 
     title = models.CharField(max_length=100)
     description = models.TextField()
     value = models.PositiveIntegerField(default=0)
     rarity = models.PositiveSmallIntegerField(
-                default=COMMON,
+                default=RARITIES[0][0], # This equals to common rarity
                 choices=RARITIES, 
                 validators=[MaxValueValidator(len(RARITIES))],
     )
@@ -40,15 +30,6 @@ class Item(models.Model):
     date_created = models.DateTimeField(default=timezone.now)
     last_modified = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
-    def was_published_recently(self):
-        now = timezone.now()
-        return now - timedelta(days=1) <= self.date_created <= now
-
-    def was_modified_recently(self):
-        now = timezone.now()
-        return now - timedelta(days=1) <= self.last_modified <= now
 
     def __str__(self):
         return self.title

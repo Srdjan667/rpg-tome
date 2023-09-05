@@ -1,15 +1,15 @@
 from functools import reduce
 from operator import or_
 
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.decorators import login_required
-from django.views.generic import DetailView, UpdateView, DeleteView
-from django.core.paginator import Paginator
-from django.db.models import Q
+from django import forms
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.utils import timezone
-from django import forms
+from django.views.generic import DetailView, UpdateView, DeleteView
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required
 
 from .helpers import get_sort_criteria, get_sort_direction
 from .forms import CreateItemForm
@@ -126,24 +126,8 @@ class ItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 	form_class = CreateItemForm
 	success_url = '/'
 
-	def form_valid(self, form):
-		form.instance.author = self.request.user
-		return super().form_valid(form)
-
-	def test_func(self):
-		entry = self.get_object()
-		if self.request.user == entry.author:
-			return True
-		return False
-
 
 class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 	model = Item
 	context_object_name = 'item'
 	success_url = '/'
-
-	def test_func(self):
-		entry = self.get_object()
-		if self.request.user == entry.author:
-			return True
-		return False

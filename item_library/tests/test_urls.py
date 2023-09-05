@@ -4,7 +4,7 @@ from item_library.views import (
 	index, new_item, ItemDetailView, ItemUpdateView, ItemDeleteView)
 
 
-class TestUrls(SimpleTestCase):
+class TestItemLibraryUrls(SimpleTestCase):
 	
 	def test_index_is_resolved(self):
 		url = reverse('item_library:index')
