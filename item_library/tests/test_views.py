@@ -87,6 +87,8 @@ class ItemLibraryViewsTest(TestCase):
 
 
 class ItemLibrarySortingTest(TestCase):
+    URL_NAME = "item_library:index"
+
     @classmethod
     def setUpTestData(cls):
         # Create user
@@ -125,6 +127,11 @@ class ItemLibrarySortingTest(TestCase):
         return re.findall(pattern, response)
 
 
+    def get_response(self, form_data):
+        response = self.client.get(reverse(self.URL_NAME), data=form_data)
+        return response
+
+
     def test_index_view_is_date_created_order_working(self):
 
         # Simulate user sorting items by the time they were created
@@ -134,8 +141,7 @@ class ItemLibrarySortingTest(TestCase):
         "direction": "ascending"
         }
 
-        response = self.client.get(reverse('item_library:index'), 
-                                            data=form_data)
+        response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("date_created")
         html_items = self.find_items_in_html(response.content.decode("utf-8"))
@@ -153,8 +159,7 @@ class ItemLibrarySortingTest(TestCase):
         "direction": "ascending"
         }
 
-        response = self.client.get(reverse('item_library:index'), 
-                                            data=form_data)
+        response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("title")
         html_items = self.find_items_in_html(response.content.decode("utf-8"))
@@ -172,8 +177,7 @@ class ItemLibrarySortingTest(TestCase):
         "direction": "ascending"
         }
 
-        response = self.client.get(reverse('item_library:index'), 
-                                            data=form_data)
+        response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("rarity")
         html_items = self.find_items_in_html(response.content.decode("utf-8"))
@@ -191,8 +195,7 @@ class ItemLibrarySortingTest(TestCase):
         "direction": "ascending"
         }
 
-        response = self.client.get(reverse('item_library:index'), 
-                                            data=form_data)
+        response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("value")
         html_items = self.find_items_in_html(response.content.decode("utf-8"))
@@ -202,6 +205,8 @@ class ItemLibrarySortingTest(TestCase):
 
 
 class ItemLibraryFilteringTest(TestCase):
+    URL_NAME = "item_library:index"
+
     @classmethod
     def setUpTestData(cls):
         # Create user
@@ -242,14 +247,18 @@ class ItemLibraryFilteringTest(TestCase):
         return re.findall(pattern, response)
 
 
+    def get_response(self, form_data):
+        response = self.client.get(reverse(self.URL_NAME), data=form_data)
+        return response
+
+
     def test_index_view_is_title_filter_working(self):
         form_data = {
         "submit": "",
         "title": "item",
         }
 
-        response = self.client.get(reverse('item_library:index'), 
-                                            data=form_data)
+        response = self.get_response(form_data)
 
         # Fetch items from the database that contain title
         params = {"title__icontains": form_data["title"]}
@@ -267,8 +276,7 @@ class ItemLibraryFilteringTest(TestCase):
         "min_value": randint(1, 50000)
         }
 
-        response = self.client.get(reverse('item_library:index'), 
-                                            data=form_data)
+        response = self.get_response(form_data)
 
         # Fetch items from the database whose value is equal or greater than
         # min_value
@@ -287,8 +295,7 @@ class ItemLibraryFilteringTest(TestCase):
         "max_value": randint(1, 50000)
         }
 
-        response = self.client.get(reverse('item_library:index'), 
-                                            data=form_data)
+        response = self.get_response(form_data)
 
         # Fetch items from the database whose value is less or equal than
         # min_value
