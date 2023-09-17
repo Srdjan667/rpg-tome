@@ -4,7 +4,7 @@ Run the following commands to install:
 ## Requirements
 
     python 3.7 or greater
-    
+
     pip install -r requirements.txt
 
 ## Development server

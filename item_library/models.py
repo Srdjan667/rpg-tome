@@ -1,15 +1,22 @@
-from django.db import models
-from django.utils import timezone
-from django.urls import reverse
-from django.core.validators import MaxValueValidator
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator
+from django.db import models
+from django.urls import reverse
+from django.utils import timezone
+
 
 class Item(models.Model):
     """
-    By using integers to define choices, it's possible to enforce 
-    the set of allowed values in the database, and prevent invalid data 
+    By using integers to define choices, it's possible to enforce
+    the set of allowed values in the database, and prevent invalid data
     from being inserted into the database.
     """
+
+    COMMON = 1
+    UNCOMMON = 2
+    RARE = 3
+    VERY_RARE = 4
+    LEGENDARY = 5
 
     RARITIES = (
         (1, "Common"),
@@ -23,9 +30,9 @@ class Item(models.Model):
     description = models.TextField()
     value = models.PositiveIntegerField(default=0)
     rarity = models.PositiveSmallIntegerField(
-                default=RARITIES[0][0], # This equals to common rarity
-                choices=RARITIES, 
-                validators=[MaxValueValidator(len(RARITIES))],
+        default=COMMON,
+        choices=RARITIES,
+        validators=[MaxValueValidator(len(RARITIES))],
     )
 
     date_created = models.DateTimeField(default=timezone.now)

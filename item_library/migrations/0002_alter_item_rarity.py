@@ -5,15 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('item_library', '0001_initial'),
+        ("item_library", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='item',
-            name='rarity',
-            field=models.PositiveSmallIntegerField(choices=[(1, 'Common'), (2, 'Uncommon'), (3, 'Rare'), (4, 'Very Rare'), (5, 'Legendary')], validators=[django.core.validators.MaxValueValidator(5)]),
+            model_name="item",
+            name="rarity",
+            field=models.PositiveSmallIntegerField(
+                choices=[
+                    (1, "Common"),
+                    (2, "Uncommon"),
+                    (3, "Rare"),
+                    (4, "Very Rare"),
+                    (5, "Legendary"),
+                ],
+                validators=[django.core.validators.MaxValueValidator(5)],
+            ),
         ),
     ]

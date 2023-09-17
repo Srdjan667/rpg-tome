@@ -20,7 +20,7 @@
                     {{ error }}
                   </p>
                   {% endfor %}
-                  
+
                   {% for field in form.visible_fields %}
                   <div class="form-group">
                     {% for error in field.errors %}
@@ -50,7 +50,7 @@
               </div>
             </div>
             <div>
-              <p class="mb-0">Already have an account? 
+              <p class="mb-0">Already have an account?
                 <a href="{% url 'account:login' %}" class="text-white-50 fw-bold">Log In
                 </a>
               </p>

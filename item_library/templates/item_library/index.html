@@ -1,5 +1,5 @@
-{% extends 'item_library/base.html' %} 
-{% load static %} 
+{% extends 'item_library/base.html' %}
+{% load static %}
 {% block content %}
 <div class="container">
   <form method="GET">
@@ -53,8 +53,8 @@
       </div>
     </div>
   </form>
-  {% if messages %} 
-    {% for message in messages %} 
+  {% if messages %}
+    {% for message in messages %}
       {% if message.tags == 'success' %}
         <div class="alert alert-success" role="alert">
           {{ message }}
@@ -63,8 +63,8 @@
         <div class="alert alert-danger" role="alert">
           {{ message }}
         </div>
-      {% endif %} 
-    {% endfor %} 
+      {% endif %}
+    {% endfor %}
   {% endif %}
 </div>
 <div class="row">
