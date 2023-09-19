@@ -1,13 +1,8 @@
-from functools import reduce
-from operator import or_
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.paginator import Paginator
-from django.db.models import Q
 from django.shortcuts import redirect, render
-from django.utils import timezone
 from django.views.generic import DeleteView, DetailView, UpdateView
 
 from .forms import CreateItemForm
@@ -15,65 +10,19 @@ from .helpers import get_sort_criteria, get_sort_direction
 from .models import Item
 
 ITEMS_PER_PAGE = 10
-FILTERS = ["title", "min_value", "max_value"]
 RARITIES = {"common": 1, "uncommon": 2, "rare": 3, "very rare": 4, "legendary": 5}
-
-
-def order_items(request, items):
-    direction_mapping = {"ascending": "", "descending": "-"}
-
-    # Gets order criteria from URL
-    order = request.GET.get("order", "date_created")
-    order_direction = request.GET.get("direction", "descending")
-
-    order = order.replace(" ", "_")
-    order_direction = direction_mapping[order_direction]
-
-    # Combines direction_mapping with ordering criteria
-    items = items.order_by(order_direction + order)
-
-    return items
-
-
-def filter_items(request):
-    items = Item.objects.filter(author=request.user, date_created__lte=timezone.now())
-
-    template_filters = {}
-
-    if request.method == "GET":
-        for i in FILTERS:
-            template_filters[i] = request.GET.get(i)
-
-    if template_filters["title"]:
-        items = items.filter(title__icontains=template_filters["title"])
-    if template_filters["min_value"]:
-        items = items.filter(value__gte=template_filters["min_value"])
-    if template_filters["max_value"]:
-        items = items.filter(value__lte=template_filters["max_value"])
-
-    rarity_filters = [
-        Q(rarity=RARITIES[r]) for r in RARITIES if request.GET.get(r, None) == "on"
-    ]
-
-    if rarity_filters:
-        items = items.filter(reduce(or_, rarity_filters))
-
-    return items
 
 
 @login_required
 def index(request):
     rarity_dict = {}
 
-    if request.method == "GET":
-        # Filter items based on GET criteria
-        items = filter_items(request)
-
     # Make a dict of all checked out rarity checkboxes
-    for r in RARITIES.keys():
+    for r in RARITIES:
         rarity_dict[r] = request.GET.get(r, None)
 
-    items = order_items(request, items)
+    items = Item.get_queryset(request)
+    items = Item.sort_queryset(request, items)
 
     paginator = Paginator(items, ITEMS_PER_PAGE)
     page_number = request.GET.get("page")
