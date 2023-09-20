@@ -16,35 +16,32 @@ class ItemLibraryViewsTest(TestCase):
     def setUpTestData(cls):
         cls.user = User.objects.create_user(username="testuser", password="testing321")
 
-        cls.common_item = Item(
-            title="Spear",
-            description="A shiny spear",
-            value=250,
-            rarity=1,
-            date_created=timezone.now(),
-            author=cls.user,
+        cls.objs = Item.objects.bulk_create(
+            [
+                Item(
+                    title="Spear",
+                    description="A shiny spear",
+                    value=250,
+                    rarity=1,
+                    date_created=timezone.now(),
+                    author=cls.user,
+                ),
+                Item(
+                    title="Magic Wand",
+                    description="A magical wand",
+                    value=2000,
+                    rarity=3,
+                    date_created=timezone.now(),
+                    author=cls.user,
+                ),
+                Item(
+                    title="Axe",
+                    description="Axe from future",
+                    date_created=timezone.now() + timedelta(days=30),
+                    author=cls.user,
+                ),
+            ]
         )
-
-        cls.rare_item = Item(
-            title="Magic Wand",
-            description="A magical wand",
-            value=2000,
-            rarity=3,
-            date_created=timezone.now(),
-            author=cls.user,
-        )
-
-        time = timezone.now() + timedelta(days=30)
-        cls.future_item = Item(
-            title="Axe",
-            description="Axe from future",
-            date_created=time,
-            author=cls.user,
-        )
-
-        cls.common_item.save()
-        cls.rare_item.save()
-        cls.future_item.save()
 
     def setUp(self):
         self.client = Client()
@@ -62,16 +59,16 @@ class ItemLibraryViewsTest(TestCase):
         response = self.client.get(reverse("item_library:index"))
         response_content = str(response.content)
 
-        self.assertIn(self.common_item.title, response_content)
-        self.assertIn(self.common_item.description, response_content)
+        self.assertIn(self.objs[0].title, response_content)
+        self.assertIn(self.objs[0].description, response_content)
 
     def test_index_view_is_future_item_displayed(self):
         response = self.client.get(reverse("item_library:index"))
         response_content = str(response.content)
 
         # Items whose date_created is in future should not be displayed
-        self.assertNotIn(self.future_item.title, response_content)
-        self.assertNotIn(self.future_item.description, response_content)
+        self.assertNotIn(self.objs[2].title, response_content)
+        self.assertNotIn(self.objs[2].description, response_content)
 
     def test_index_view_is_filter_working(self):
         form_data = {"submit": "", "rare": "on"}
@@ -80,8 +77,8 @@ class ItemLibraryViewsTest(TestCase):
         response_content = str(response.content)
 
         # Only items with "rare" rarity should be displayed
-        self.assertNotIn(self.common_item.title, response_content)
-        self.assertIn(self.rare_item.title, response_content)
+        self.assertNotIn(self.objs[0].title, response_content)
+        self.assertIn(self.objs[1].title, response_content)
 
 
 class ItemLibrarySortingTest(TestCase):
@@ -96,13 +93,12 @@ class ItemLibrarySortingTest(TestCase):
 
         # Create enough items for one page with random values
         for i in range(ITEMS_PER_PAGE):
-            create_item = Item(
+            Item.objects.create(
                 title=f"{item_name}{i}",
                 value=randint(1, 50000),
                 rarity=randint(1, 5),
                 author=cls.user,
             )
-            create_item.save()
 
     def setUp(self):
         # Create client for interacting with view
@@ -131,7 +127,6 @@ class ItemLibrarySortingTest(TestCase):
     def test_index_view_is_date_created_order_working(self):
         # Simulate user sorting items by the time they were created
         form_data = {"submit": "", "order": "date_created", "direction": "ascending"}
-
         response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("date_created")
@@ -143,7 +138,6 @@ class ItemLibrarySortingTest(TestCase):
     def test_index_view_is_title_order_working(self):
         # Simulate user sorting items by their titles
         form_data = {"submit": "", "order": "title", "direction": "ascending"}
-
         response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("title")
@@ -155,7 +149,6 @@ class ItemLibrarySortingTest(TestCase):
     def test_index_view_is_rarity_order_working(self):
         # Simulate user sorting items by their rarities
         form_data = {"submit": "", "order": "rarity", "direction": "ascending"}
-
         response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("rarity")
@@ -167,7 +160,6 @@ class ItemLibrarySortingTest(TestCase):
     def test_index_view_is_value_order_working(self):
         # Simulate user sorting items by their values
         form_data = {"submit": "", "order": "value", "direction": "ascending"}
-
         response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("value")
@@ -189,13 +181,12 @@ class ItemLibraryFilteringTest(TestCase):
 
         # Create enough items for one page with random values
         for i in range(ITEMS_PER_PAGE):
-            create_item = Item(
+            Item.objects.create(
                 title=f"{item_name}{i}",
                 value=randint(1, 50000),
                 rarity=randint(1, 5),
                 author=cls.user,
             )
-            create_item.save()
 
     def setUp(self):
         # Create client for interacting with view
