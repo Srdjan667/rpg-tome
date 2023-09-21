@@ -79,8 +79,20 @@ class ItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     form_class = CreateItemForm
     success_url = "/"
 
+    def test_func(self):
+        entry = self.get_object()
+        if self.request.user == entry.author:
+            return True
+        return False
+
 
 class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Item
     context_object_name = "item"
     success_url = "/"
+
+    def test_func(self):
+        entry = self.get_object()
+        if self.request.user == entry.author:
+            return True
+        return False
