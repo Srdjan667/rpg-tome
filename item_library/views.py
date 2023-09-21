@@ -10,7 +10,14 @@ from .helpers import get_sort_criteria, get_sort_direction
 from .models import Item
 
 ITEMS_PER_PAGE = 10
-RARITIES = {"common": 1, "uncommon": 2, "rare": 3, "very rare": 4, "legendary": 5}
+RARITIES = {
+    "common": 1,
+    "uncommon": 2,
+    "rare": 3,
+    "very rare": 4,
+    "legendary": 5,
+    "artifact": 6,
+}
 
 
 @login_required
@@ -47,12 +54,15 @@ def new_item(request):
             item = form.save(commit=False)
             item.author = request.user
             item.save()
+
             messages.success(request, "Item successfully created")
+
         # Return error
         else:
             messages.error(request, "Item is not valid")
 
         return redirect("item_library:index")
+
     else:
         form = CreateItemForm()
 

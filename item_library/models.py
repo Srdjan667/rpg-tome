@@ -19,6 +19,7 @@ class Item(models.Model):
     RARE = 3
     VERY_RARE = 4
     LEGENDARY = 5
+    ARTIFACT = 6
 
     RARITIES = (
         (COMMON, "Common"),
@@ -26,6 +27,7 @@ class Item(models.Model):
         (RARE, "Rare"),
         (VERY_RARE, "Very Rare"),
         (LEGENDARY, "Legendary"),
+        (ARTIFACT, "Artifact"),
     )
 
     title = models.CharField(max_length=100)
@@ -54,6 +56,7 @@ class Item(models.Model):
             "rare": 3,
             "very rare": 4,
             "legendary": 5,
+            "artifact": 6,
         }
         FILTERS = {
             "title__icontains": request.GET.get("title"),
@@ -79,11 +82,11 @@ class Item(models.Model):
                 checkbox_filters.append(RARITIES[k])
 
         if checkbox_filters:
-            final_items = []
+            filtered_items = []
             for i in items:
                 if i.rarity in checkbox_filters:
-                    final_items.append(i)
-            return final_items
+                    filtered_items.append(i)
+            return filtered_items
         return items
 
     def sort_queryset(request, q):
