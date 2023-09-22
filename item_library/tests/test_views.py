@@ -87,7 +87,7 @@ class ItemLibrarySortingTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Create user
-        cls.user = User.objects.create_user("testuser", password="testing321")
+        cls.user = User.objects.create_user(username="testuser", password="testing321")
 
         item_name = "Item"
 
@@ -175,7 +175,7 @@ class ItemLibraryFilteringTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Create user
-        cls.user = User.objects.create_user("testuser", password="testing321")
+        cls.user = User.objects.create_user(username="testuser", password="testing321")
 
         item_name = "Item"
 
@@ -259,3 +259,56 @@ class ItemLibraryFilteringTest(TestCase):
 
         # Compare items from database with those generated in HTML
         self.assertEqual(sorted(items_from_database), sorted(html_items))
+
+
+class ItemLibraryDeleteViewTest(TestCase):
+    URL_NAME = "item_library:item-delete"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.first_user = User.objects.create_user(
+            username="firstuser", password="testing321"
+        )
+        cls.second_user = User.objects.create_user(
+            username="seconduser", password="testing123"
+        )
+
+        cls.first_item = Item.objects.create(
+            title="FirstItem",
+            author=cls.first_user,
+        )
+        cls.second_item = Item.objects.create(
+            title="SecondItem",
+            author=cls.second_user,
+        )
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_user_can_delete_item(self):
+        self.login_successful = self.client.login(
+            username="firstuser", password="testing321"
+        )
+
+        # Simulate logged in user deleting a view
+        self.client.post(reverse(self.URL_NAME, args=[self.first_item.id]))
+
+        self.assertEqual(Item.objects.filter(title=self.first_item.title).count(), 0)
+
+    def test_anonymous_user_can_not_delete_item(self):
+        # Simulate anonymous user deleting a view
+        self.client.post(reverse(self.URL_NAME, args=[self.second_item.id]))
+
+        self.assertNotEqual(
+            Item.objects.filter(title=self.second_item.title).count(), 0
+        )
+
+    def test_first_user_can_not_delete_item_second_user_item(self):
+        self.client.login(username="firstuser", password="testing321")
+
+        # Simulate anonymous user trying delete a view
+        self.client.post(reverse(self.URL_NAME, args=[self.second_item.id]))
+
+        self.assertNotEqual(
+            Item.objects.filter(title=self.second_item.title).count(), 0
+        )
