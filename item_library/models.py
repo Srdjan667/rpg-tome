@@ -31,10 +31,11 @@ class Item(models.Model):
     )
 
     title = models.CharField(max_length=100)
-    description = models.TextField()
-    value = models.PositiveIntegerField(default=0)
+    description = models.TextField(null=True)
+    value = models.PositiveIntegerField(default=0, null=True)
     rarity = models.PositiveSmallIntegerField(
         default=COMMON,
+        null=True,
         choices=RARITIES,
         validators=[MaxValueValidator(len(RARITIES))],
     )

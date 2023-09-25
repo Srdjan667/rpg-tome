@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
-from .forms import CreateItemForm
+from .forms import CreateItemForm, UpdateItemForm
 from .helpers import get_sort_criteria, get_sort_direction
 from .models import Item
 
@@ -76,7 +76,7 @@ class ItemDetailView(LoginRequiredMixin, DetailView):
 
 class ItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Item
-    form_class = CreateItemForm
+    form_class = UpdateItemForm
     success_url = "/"
 
     def test_func(self):
