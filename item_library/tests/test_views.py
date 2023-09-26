@@ -312,3 +312,68 @@ class ItemLibraryDeleteViewTest(TestCase):
         self.assertNotEqual(
             Item.objects.filter(title=self.second_item.title).count(), 0
         )
+
+
+class ItemLibraryUpdateViewTest(TestCase):
+    URL_NAME = "item_library:item-update"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.first_user = User.objects.create_user(
+            username="firstuser", password="testing321"
+        )
+        cls.second_user = User.objects.create_user(
+            username="seconduser", password="testing123"
+        )
+
+    def setUp(self):
+        self.client = Client()
+
+        self.item_for_editing = Item.objects.create(
+            title="EditableItem",
+            description="Edit This.",
+            value=1000,
+            rarity=4,
+            author=self.first_user,
+        )
+
+    def test_user_can_edit_item(self):
+        self.client.login(username="firstuser", password="testing321")
+        form_data = {"title": "Lance"}
+
+        # Simulate logged in user editing a view
+        res = self.client.post(
+            reverse(self.URL_NAME, args=[self.item_for_editing.id]), data=form_data
+        )
+        item = Item.objects.get(author=self.first_user)
+
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(item.title, form_data["title"])
+
+    # other user changing other users item
+    def test_other_user_can_not_change_item(self):
+        self.client.login(username="seconduser", password="testing123")
+        form_data = {"title": "Morningstar"}
+
+        # Simulate logged in user trying to edit item that belong to different user
+        res = self.client.post(
+            reverse(self.URL_NAME, args=[self.item_for_editing.id]), data=form_data
+        )
+        item = Item.objects.get(author=self.first_user)
+
+        # User should not be able to access other user items
+        self.assertEqual(res.status_code, 403)
+        self.assertNotEqual(item.title, form_data["title"])
+
+    def test_form_invalid(self):
+        form_data = {"title": ""}
+
+        # Simulate logged in user trying to submit invalid title
+        res = self.client.post(
+            reverse(self.URL_NAME, args=[self.item_for_editing.id]), data=form_data
+        )
+        item = Item.objects.get(author=self.first_user)
+
+        # User should be redirected after submitting invalid form
+        self.assertEqual(res.status_code, 302)
+        self.assertNotEqual(item.title, form_data["title"])
