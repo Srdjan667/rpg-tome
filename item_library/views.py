@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
-from .forms import CreateItemForm, UpdateItemForm
+from .forms import ItemsForm
 from .helpers import get_sort_criteria, get_sort_direction
 from .models import Item
 
@@ -48,7 +48,7 @@ def index(request):
 @login_required
 def new_item(request):
     if request.method == "POST":
-        form = CreateItemForm(request.POST)
+        form = ItemsForm(request.POST)
         # If everything is fine, show success message
         if form.is_valid():
             item = form.save(commit=False)
@@ -64,7 +64,7 @@ def new_item(request):
         return redirect("item_library:index")
 
     else:
-        form = CreateItemForm()
+        form = ItemsForm()
 
     return render(request, "item_library/new.html", {"form": form})
 
@@ -76,7 +76,7 @@ class ItemDetailView(LoginRequiredMixin, DetailView):
 
 class ItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Item
-    form_class = UpdateItemForm
+    form_class = ItemsForm
     success_url = "/"
 
     def test_func(self):
