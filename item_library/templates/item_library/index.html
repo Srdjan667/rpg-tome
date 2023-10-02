@@ -89,8 +89,8 @@
       <span class="step-links">
         {% if page_obj.has_previous %}
         <!-- Generate correct URL, depending on if there are parameters present or not -->
-        <a href="{{ request.get_full_path }}{% if request.GET %}&{% else %}?{% endif %}page=1">&laquo; first</a>
-        <a href="{{ request.get_full_path }}{% if request.GET %}&{% else %}?{% endif %}{{ page_obj.previous_page_number }}">previous</a>
+        <a href="{{ path_without_page }}&amp;page=1">&laquo; first</a>
+        <a href="{{ path_without_page }}&amp;page={{ page_obj.previous_page_number }}">previous</a>
         {% endif %}
       </span>
 
@@ -99,8 +99,8 @@
       </span>
 
       {% if page_obj.has_next %}
-      <a href="{{ request.get_full_path }}{% if request.GET %}&{% else %}?{% endif %}page={{ page_obj.next_page_number }}">next</a>
-      <a href="{{ request.get_full_path }}{% if request.GET %}&{% else %}?{% endif %}page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      <a href="{{ path_without_page }}&amp;page={{ page_obj.next_page_number }}">next</a>
+      <a href="{{ path_without_page }}&amp;page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
       {% endif %}
     </div>
   </div>

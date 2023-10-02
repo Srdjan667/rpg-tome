@@ -27,3 +27,15 @@ def get_sort_direction(request):
             sort_direction[i] = i
 
     return sort_direction
+
+
+# Avoids ?page duplication in URL
+def url_strip_page_number(request):
+    request = request.GET.copy()
+    request.pop("page", None)
+
+    return request.urlencode()
+
+
+def path_without_page(request):
+    return f"{request.path}?{url_strip_page_number(request)}"

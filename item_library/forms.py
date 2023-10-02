@@ -34,3 +34,9 @@ class ItemsForm(ModelForm):
     class Meta:
         model = Item
         fields = ["title", "description", "value", "rarity"]
+
+    def clean_value(self):
+        data = self.cleaned_data["value"]
+        if data is None:
+            return 0
+        return data

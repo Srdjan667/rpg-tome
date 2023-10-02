@@ -62,3 +62,12 @@ class ItemsFormTest(TestCase):
         form = ItemsForm(data=form_data)
 
         self.assertFalse(form.is_valid())
+
+    def test_default_value(self):
+        form_data = {"title": "Anduril"}
+        form = ItemsForm(data=form_data)
+
+        form.is_valid()
+
+        # Make sure value is defaulted to 0 instead of None
+        self.assertEqual(form.cleaned_data["value"], 0)

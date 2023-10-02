@@ -6,7 +6,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
 from .forms import ItemsForm
-from .helpers import get_sort_criteria, get_sort_direction
+from .helpers import get_sort_criteria, get_sort_direction, path_without_page
 from .models import Item
 
 ITEMS_PER_PAGE = 10
@@ -40,6 +40,7 @@ def index(request):
         "rarity_dict": rarity_dict,
         "sorting_dict": get_sort_criteria(request),
         "sort_direction": get_sort_direction(request),
+        "path_without_page": path_without_page(request),
     }
 
     return render(request, "item_library/index.html", context)
