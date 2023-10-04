@@ -1,7 +1,7 @@
 from operator import attrgetter
 
 from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -39,7 +39,6 @@ class Item(models.Model):
         choices=RARITIES,
         validators=[MaxValueValidator(len(RARITIES))],
     )
-
     date_created = models.DateTimeField(default=timezone.now)
     last_modified = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -107,3 +106,62 @@ class Item(models.Model):
         )
 
         return sorted_items
+
+
+class Spell(models.Model):
+    UNKNOWN = 0
+    ABJURATION = 1
+    CONJURATION = 2
+    DIVINATION = 3
+    ENCHANTMENT = 4
+    EVOCATION = 5
+    ILLUSION = 6
+    NECROMANCY = 7
+    TRANSMUTATION = 8
+
+    SCHOOLS_OF_MAGIC = (
+        (UNKNOWN, "Unknown"),
+        (ABJURATION, "Abjuration"),
+        (CONJURATION, "Conjuration"),
+        (DIVINATION, "Divination"),
+        (ENCHANTMENT, "Divination"),
+        (EVOCATION, "Evocation"),
+        (ILLUSION, "Illusion"),
+        (NECROMANCY, "Necromancy"),
+        (TRANSMUTATION, "Transmutation"),
+    )
+
+    SPELL_LEVELS = (
+        (0, "Cantrip"),
+        (1, "1st"),
+        (2, "2nd"),
+        (3, "3rd"),
+        (4, "4th"),
+        (5, "5th"),
+        (6, "6th"),
+        (7, "7th"),
+        (8, "8th"),
+        (9, "9th"),
+    )
+
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True, default="")
+    school = models.PositiveSmallIntegerField(
+        choices=SCHOOLS_OF_MAGIC,
+        default=UNKNOWN,
+        validators=[MinValueValidator(0), MaxValueValidator(len(SCHOOLS_OF_MAGIC) - 1)],
+    )
+    level = models.PositiveSmallIntegerField(
+        choices=SPELL_LEVELS,
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(len(SPELL_LEVELS))],
+    )
+    date_created = models.DateTimeField(default=timezone.now)
+    last_modified = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+    # def get_absolute_url(self):
+    #     return reverse("item_library:item-detail", args=[self.id]) # TODO edit this
