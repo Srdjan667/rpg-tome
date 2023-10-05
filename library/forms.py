@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import MinValueValidator
 from django.forms import ModelForm
 
-from item_library.models import Item, Spell
+from library.models import Item, Spell
 
 
 class ItemsForm(ModelForm):

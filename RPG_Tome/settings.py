@@ -36,7 +36,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "users.apps.UsersConfig",
-    "item_library.apps.ItemLibraryConfig",
+    "library.apps.ItemLibraryConfig",
     "widget_tweaks",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -131,7 +131,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = "account:login"
 
-LOGIN_REDIRECT_URL = "item_library:index"
+LOGIN_REDIRECT_URL = "library:index"
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"

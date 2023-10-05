@@ -7,7 +7,7 @@
     <!-- Bootstrap 4.3.1 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- Custom styles file -->
-    <link rel="stylesheet" href="{% static 'item_library/background.css' %}">
+    <link rel="stylesheet" href="{% static 'library/background.css' %}">
     <!-- Font awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <title>
@@ -24,7 +24,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="{% url 'item_library:index' %}">Home
+            <a class="nav-link" href="{% url 'library:index' %}">Home
               <span class="sr-only">(current)
               </span>
             </a>
@@ -36,7 +36,7 @@
             {{ user.get_username }}
           </button>
           <div class="dropdown-menu dropdown-menu-right">
-            <a href="{% url 'item_library:item-create' %}">
+            <a href="{% url 'library:item-create' %}">
               <button class="dropdown-item" type="button">Create new item
               </button>
             </a>

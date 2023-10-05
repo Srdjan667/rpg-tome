@@ -1,4 +1,4 @@
-{% extends 'item_library/base.html' %}
+{% extends 'library/base.html' %}
 {% load static %}
 {% block content %}
 <div class="container mt-3">
@@ -10,8 +10,8 @@
     <p class="mb-1">{{ item.description }}</p>
     <small>{{ item.date_created }}</small>
     <small>Value: {{ item.value }}</small>
-    <a href="{% url 'item_library:item-update' item.id %}"> <small>Update</small></a>
-    <a href="{% url 'item_library:item-delete' item.id %}"> <small>Delete</small></a>
+    <a href="{% url 'library:item-update' item.id %}"> <small>Update</small></a>
+    <a href="{% url 'library:item-delete' item.id %}"> <small>Delete</small></a>
   </div>
 </div>
 {% endblock content %}

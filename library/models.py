@@ -47,7 +47,7 @@ class Item(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("item_library:item-detail", args=[self.id])
+        return reverse("library:item-detail", args=[self.id])
 
     def get_queryset(request):
         RARITIES = {
@@ -164,4 +164,4 @@ class Spell(models.Model):
         return self.title
 
     # def get_absolute_url(self):
-    #     return reverse("item_library:item-detail", args=[self.id]) # TODO edit this
+    #     return reverse("library:item-detail", args=[self.id]) # TODO edit this

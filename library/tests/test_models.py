@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from item_library.models import Item, Spell
+from library.models import Item, Spell
 
 
 class ItemModelTest(TestCase):

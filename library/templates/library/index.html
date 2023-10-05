@@ -1,4 +1,4 @@
-{% extends 'item_library/base.html' %}
+{% extends 'library/base.html' %}
 {% load static %}
 {% block content %}
 <div class="container">
@@ -47,7 +47,7 @@
       <div class="form-group">
         <button type="submit" name="submit" class="btn btn-primary">Submit</button>
         <!-- Clears all previously filled fields -->
-        <a href="{% url 'item_library:index' %}">
+        <a href="{% url 'library:index' %}">
           <button type="button" name="reset" class="btn btn-primary">Reset</button>
         </a>
       </div>

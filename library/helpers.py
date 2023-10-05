@@ -1,5 +1,5 @@
 """
-All helper functions for item_library are stored here
+All helper functions for library are stored here
 """
 
 SORTING_CRITERIA = ["date created", "title", "rarity", "value"]

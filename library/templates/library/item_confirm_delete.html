@@ -1,4 +1,4 @@
-{% extends 'item_library/base.html' %}
+{% extends 'library/base.html' %}
 {% block content %}
 <div class="content-section">
   <form method="POST">
@@ -8,7 +8,7 @@
       </h4>
       <button class="btn btn-danger" type="submit">Yes, Delete
       </button>
-      <a class="btn btn-secondary" href="{% url 'item_library:item-detail' item.id %}">Cancel
+      <a class="btn btn-secondary" href="{% url 'library:item-detail' item.id %}">Cancel
       </a>
     </div>
   </form>

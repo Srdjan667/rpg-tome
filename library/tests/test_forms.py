@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from item_library.forms import ItemsForm, SpellsForm
+from library.forms import ItemsForm, SpellsForm
 
 RARITIES = ["Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Artifact"]
 

@@ -43,7 +43,7 @@ def index(request):
         "path_without_page": path_without_page(request),
     }
 
-    return render(request, "item_library/index.html", context)
+    return render(request, "library/index.html", context)
 
 
 @login_required
@@ -62,17 +62,17 @@ def new_item(request):
         else:
             messages.error(request, "Item is not valid")
 
-        return redirect("item_library:index")
+        return redirect("library:index")
 
     else:
         form = ItemsForm()
 
-    return render(request, "item_library/new.html", {"form": form})
+    return render(request, "library/new.html", {"form": form})
 
 
 class ItemDetailView(LoginRequiredMixin, DetailView):
     model = Item
-    template_name = "item_library/item_detail.html"
+    template_name = "library/item_detail.html"
 
 
 class ItemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -97,3 +97,25 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == entry.author:
             return True
         return False
+
+
+# def render_test_form(request):
+#     if request.method == "POST":
+#         form = SpellsForm(request.POST)
+#         # If everything is fine, show success message
+#         if form.is_valid():
+#             item = form.save(commit=False)
+#             item.author = User.objects.get(username="milanovic")
+#             item.save()
+
+#             return HttpResponse(
+#                 f"Item successfully created {item.get_school_display()} {item.get_level_display()}"
+#             )
+
+#         # Return error
+#         else:
+#             return HttpResponse("Item is not valid", item)
+#     else:
+#         form = SpellsForm()
+
+#     return render(request, "library/test.html", {"form": form})
