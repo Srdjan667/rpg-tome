@@ -21,7 +21,7 @@ RARITIES = {
 
 
 @login_required
-def index(request):
+def item_list(request):
     rarity_dict = {}
 
     # Make a dict of all checked out rarity checkboxes
@@ -43,7 +43,7 @@ def index(request):
         "path_without_page": path_without_page(request),
     }
 
-    return render(request, "library/index.html", context)
+    return render(request, "library/item_list.html", context)
 
 
 @login_required
@@ -62,7 +62,7 @@ def new_item(request):
         else:
             messages.error(request, "Item is not valid")
 
-        return redirect("library:index")
+        return redirect("library:item-list")
 
     else:
         form = ItemsForm()

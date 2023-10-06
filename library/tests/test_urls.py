@@ -5,15 +5,15 @@ from library.views import (
     ItemDeleteView,
     ItemDetailView,
     ItemUpdateView,
-    index,
+    item_list,
     new_item,
 )
 
 
 class TestItemLibraryUrls(SimpleTestCase):
     def test_index_is_resolved(self):
-        url = reverse("library:index")
-        self.assertEquals(resolve(url).func, index)
+        url = reverse("library:item-list")
+        self.assertEquals(resolve(url).func, item_list)
 
     def test_item_create_is_resolved(self):
         url = reverse("library:item-create")

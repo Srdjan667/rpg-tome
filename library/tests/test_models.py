@@ -28,6 +28,7 @@ class ItemModelTest(TestCase):
 
 
 class SpellModelTest(TestCase):
+    # full_clean() returns None if no exceptions are raised when validating model
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create(username="testuser")
@@ -39,7 +40,6 @@ class SpellModelTest(TestCase):
         db_entry = Spell.objects.get(title="Levitate")
 
         self.assertEqual(db_entry.title, "Levitate")
-        # full_clean() returns None if no exceptions are raised
         self.assertIsNone(self.spell.full_clean())
 
     def test_invalid_spell_school(self):

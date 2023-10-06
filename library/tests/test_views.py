@@ -51,19 +51,19 @@ class ItemLibraryViewsTest(TestCase):
         self.assertTrue(self.login_successful)
 
     def test_index_view_response(self):
-        response = self.client.get(reverse("library:index"))
+        response = self.client.get(reverse("library:item-list"))
 
         self.assertEqual(200, response.status_code)
 
     def test_index_view_is_item_displayed(self):
-        response = self.client.get(reverse("library:index"))
+        response = self.client.get(reverse("library:item-list"))
         response_content = str(response.content)
 
         self.assertIn(self.objs[0].title, response_content)
         self.assertIn(self.objs[0].description, response_content)
 
     def test_index_view_is_future_item_displayed(self):
-        response = self.client.get(reverse("library:index"))
+        response = self.client.get(reverse("library:item-list"))
         response_content = str(response.content)
 
         # Items whose date_created is in future should not be displayed
@@ -73,7 +73,7 @@ class ItemLibraryViewsTest(TestCase):
     def test_index_view_is_filter_working(self):
         form_data = {"submit": "", "rare": "on"}
 
-        response = self.client.get(reverse("library:index"), data=form_data)
+        response = self.client.get(reverse("library:item-list"), data=form_data)
         response_content = str(response.content)
 
         # Only items with "rare" rarity should be displayed
@@ -82,7 +82,7 @@ class ItemLibraryViewsTest(TestCase):
 
 
 class ItemLibrarySortingTest(TestCase):
-    URL_NAME = "library:index"
+    URL_NAME = "library:item-list"
 
     @classmethod
     def setUpTestData(cls):
@@ -170,7 +170,7 @@ class ItemLibrarySortingTest(TestCase):
 
 
 class ItemLibraryFilteringTest(TestCase):
-    URL_NAME = "library:index"
+    URL_NAME = "library:item-list"
 
     @classmethod
     def setUpTestData(cls):
