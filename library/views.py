@@ -7,7 +7,7 @@ from django.views.generic import DeleteView, DetailView, UpdateView
 
 from .forms import ItemsForm
 from .helpers import get_sort_criteria, get_sort_direction, path_without_page
-from .models import Item
+from .models import Item, Spell
 
 ITEMS_PER_PAGE = 10
 RARITIES = {
@@ -97,6 +97,17 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == entry.author:
             return True
         return False
+
+
+@login_required
+def spell_list(request):
+    spells = Spell.objects.filter(author=request.user)
+    # items = Item.sort_queryset(request, items)
+    context = {
+        "spells": spells,
+    }
+
+    return render(request, "library/spell_list.html", context)
 
 
 # def render_test_form(request):

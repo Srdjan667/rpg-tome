@@ -1,0 +1,37 @@
+{% extends 'library/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        <div class="alert alert-success" role="alert">
+          {{ message }}
+        </div>
+      {% else %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</div>
+<div class="row">
+  <div class="container">
+    <div class="list-group">
+      <!-- Generates list of spells on current page -->
+      {% for spell in spells %}
+      <a href="{{ spell.get_absolute_url }}" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ spell.title }}</h5>
+          <small>{{ spell.get_level_display }} </small>
+        </div>
+        <p class="mb-1">{{ spell.description }}</p>
+        <div class="d-flex w-100 justify-content-between">
+          <small>{{ spell.date_created }} </small>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+</div>
+{% endblock content %}
