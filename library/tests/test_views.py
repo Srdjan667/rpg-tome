@@ -7,7 +7,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from library.models import Item
+from library.models import Item, Spell
 from library.views import ITEMS_PER_PAGE
 
 
@@ -50,19 +50,19 @@ class ItemLibraryViewsTest(TestCase):
         )
         self.assertTrue(self.login_successful)
 
-    def test_index_view_response(self):
+    def test_item_list_view_response(self):
         response = self.client.get(reverse("library:item-list"))
 
         self.assertEqual(200, response.status_code)
 
-    def test_index_view_is_item_displayed(self):
+    def test_item_list_view_is_item_displayed(self):
         response = self.client.get(reverse("library:item-list"))
         response_content = str(response.content)
 
         self.assertIn(self.objs[0].title, response_content)
         self.assertIn(self.objs[0].description, response_content)
 
-    def test_index_view_is_future_item_displayed(self):
+    def test_item_list_view_is_future_item_displayed(self):
         response = self.client.get(reverse("library:item-list"))
         response_content = str(response.content)
 
@@ -70,7 +70,7 @@ class ItemLibraryViewsTest(TestCase):
         self.assertNotIn(self.objs[2].title, response_content)
         self.assertNotIn(self.objs[2].description, response_content)
 
-    def test_index_view_is_filter_working(self):
+    def test_item_list_view_is_filter_working(self):
         form_data = {"submit": "", "rare": "on"}
 
         response = self.client.get(reverse("library:item-list"), data=form_data)
@@ -314,7 +314,7 @@ class ItemLibraryDeleteViewTest(TestCase):
         )
 
 
-class ItemLibraryUpdateViewTest(TestCase):
+class ItemUpdateViewTest(TestCase):
     URL_NAME = "library:item-update"
 
     @classmethod
@@ -377,3 +377,123 @@ class ItemLibraryUpdateViewTest(TestCase):
         # User should be redirected after submitting invalid form
         self.assertEqual(res.status_code, 302)
         self.assertNotEqual(item.title, form_data["title"])
+
+
+class SpellLibraryViewsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username="testuser", password="testing321")
+        cls.obj = Spell.objects.create(
+            title="Slow",
+            description="Spell that slows down enemy.",
+            school=6,
+            level=4,
+            author=cls.user,
+        )
+
+    def setUp(self):
+        self.client = Client()
+        self.login_successful = self.client.login(
+            username="testuser", password="testing321"
+        )
+        self.assertTrue(self.login_successful)
+
+    def test_spell_list_view_response(self):
+        response = self.client.get(reverse("library:spell-list"))
+
+        self.assertEqual(200, response.status_code)
+
+    def test_spell_list_view_is_spell_displayed(self):
+        response = self.client.get(reverse("library:spell-list"))
+        response_content = str(response.content)
+
+        self.assertIn(self.obj.title, response_content)
+        self.assertIn(self.obj.get_level_display(), response_content)
+
+
+class SpellLibraryDeleteViewTest(TestCase):
+    URL_NAME = "library:spell-delete"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.sample_user = User.objects.create_user(
+            username="firstuser", password="testing321"
+        )
+
+        cls.first_spell = Spell.objects.create(
+            title="Arms of Hadar",
+            author=cls.sample_user,
+        )
+
+        cls.second_spell = Spell.objects.create(
+            title="Armor of Agathys",
+            author=cls.sample_user,
+        )
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_user_can_delete_spell(self):
+        self.login_successful = self.client.login(
+            username="firstuser", password="testing321"
+        )
+
+        # Simulate logged in user deleting a view
+        self.client.post(reverse(self.URL_NAME, args=[self.first_spell.id]))
+
+        self.assertEqual(Spell.objects.filter(title=self.first_spell.title).count(), 0)
+
+    def test_anonymous_user_can_not_delete_spell(self):
+        # Simulate anonymous user deleting a view
+        self.client.post(reverse(self.URL_NAME, args=[self.second_spell.id]))
+
+        self.assertNotEqual(
+            Spell.objects.filter(title=self.second_spell.title).count(), 0
+        )
+
+
+class SpellUpdateViewTest(TestCase):
+    URL_NAME = "library:spell-update"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_user = User.objects.create_user(
+            username="firstuser", password="testing321"
+        )
+
+    def setUp(self):
+        self.client = Client()
+
+        self.spell_for_editing = Spell.objects.create(
+            title="EditableSpell",
+            description="Edit This.",
+            school=4,
+            level=2,
+            author=self.test_user,
+        )
+
+    def test_user_can_edit_item(self):
+        self.client.login(username="firstuser", password="testing321")
+        form_data = {"title": "Earthquake"}
+
+        # Simulate logged in user editing a view
+        res = self.client.post(
+            reverse(self.URL_NAME, args=[self.spell_for_editing.id]), data=form_data
+        )
+        spell = Spell.objects.get(author=self.test_user)
+
+        self.assertEqual(res.status_code, 302)
+        self.assertEqual(spell.title, form_data["title"])
+
+    def test_form_invalid(self):
+        form_data = {"title": ""}
+
+        # Simulate logged in user trying to submit invalid title
+        res = self.client.post(
+            reverse(self.URL_NAME, args=[self.spell_for_editing.id]), data=form_data
+        )
+        spell = Spell.objects.get(author=self.test_user)
+
+        # User should be redirected after submitting invalid form
+        self.assertEqual(res.status_code, 302)
+        self.assertNotEqual(spell.title, form_data["title"])

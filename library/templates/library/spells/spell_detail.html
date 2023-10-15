@@ -1,0 +1,17 @@
+{% extends 'library/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-3">
+  <div class="list-group">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ spell.title }}</h5>
+      <small>{{ spell.get_level_display }}</small>
+    </div>
+    <p class="mb-1">{{ spell.description }}</p>
+    <small>School of magic: {{ spell.get_school_display }}</small>
+    <small>Created on {{ spell.date_created }}</small>
+    <a href="{% url 'library:spell-update' spell.id %}"> <small>Update</small></a>
+    <a href="{% url 'library:spell-delete' spell.id %}"> <small>Delete</small></a>
+  </div>
+</div>
+{% endblock content %}

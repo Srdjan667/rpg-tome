@@ -163,5 +163,5 @@ class Spell(models.Model):
     def __str__(self):
         return self.title
 
-    # def get_absolute_url(self):
-    #     return reverse("library:item-detail", args=[self.id]) # TODO edit this
+    def get_absolute_url(self):
+        return reverse("library:spell-detail", args=[self.id])

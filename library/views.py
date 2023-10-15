@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
-from .forms import ItemsForm
+from .forms import ItemsForm, SpellsForm
 from .helpers import get_sort_criteria, get_sort_direction, path_without_page
 from .models import Item, Spell
 
@@ -101,32 +101,64 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 @login_required
 def spell_list(request):
-    spells = Spell.objects.filter(author=request.user)
-    # items = Item.sort_queryset(request, items)
+    spells = Spell.objects.filter(author=request.user).order_by("-date_created")
     context = {
         "spells": spells,
     }
 
-    return render(request, "library/spell_list.html", context)
+    return render(request, "library/spells/spell_list.html", context)
 
 
-# def render_test_form(request):
-#     if request.method == "POST":
-#         form = SpellsForm(request.POST)
-#         # If everything is fine, show success message
-#         if form.is_valid():
-#             item = form.save(commit=False)
-#             item.author = User.objects.get(username="milanovic")
-#             item.save()
+@login_required
+def new_spell(request):
+    if request.method == "POST":
+        form = SpellsForm(request.POST)
+        # If everything is fine, show success message
+        if form.is_valid():
+            spell = form.save(commit=False)
+            spell.author = request.user
+            spell.save()
 
-#             return HttpResponse(
-#                 f"Item successfully created {item.get_school_display()} {item.get_level_display()}"
-#             )
+            messages.success(request, "Spell successfully created")
 
-#         # Return error
-#         else:
-#             return HttpResponse("Item is not valid", item)
-#     else:
-#         form = SpellsForm()
+        # Return error
+        else:
+            messages.error(request, "Spell is not valid")
 
-#     return render(request, "library/test.html", {"form": form})
+        return redirect("library:spell-list")
+
+    else:
+        form = SpellsForm()
+
+    return render(request, "library/spells/new_spell.html", {"form": form})
+
+
+class SpellDetailView(LoginRequiredMixin, DetailView):
+    model = Spell
+    template_name = "library/spells/spell_detail.html"
+
+
+class SpellUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Spell
+    template_name = "library/spells/spell_form.html"
+    form_class = SpellsForm
+    success_url = "/spells/"
+
+    def test_func(self):
+        entry = self.get_object()
+        if self.request.user == entry.author:
+            return True
+        return False
+
+
+class SpellDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Spell
+    template_name = "library/spells/spell_confirm_delete.html"
+    context_object_name = "spell"
+    success_url = "/spells/"
+
+    def test_func(self):
+        entry = self.get_object()
+        if self.request.user == entry.author:
+            return True
+        return False

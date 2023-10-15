@@ -1,0 +1,16 @@
+{% extends 'library/base.html' %}
+{% block content %}
+<div class="content-section">
+  <form method="POST">
+    {% csrf_token %}
+    <div class="ml-3 mt-3">
+      <h4>Are you sure you want to delete the spell "{{ spell.title }}"
+      </h4>
+      <button class="btn btn-danger" type="submit">Yes, Delete
+      </button>
+      <a class="btn btn-secondary" href="{% url 'library:spell-detail' spell.id %}">Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock content %}
