@@ -6,10 +6,12 @@ from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
 from .forms import ItemsForm, SpellsForm
-from .helpers import get_sort_criteria, get_sort_direction, path_without_page
+from .helpers import get_sort_parameters, path_without_page
 from .models import Item, Spell
 
 ITEMS_PER_PAGE = 10
+SORT_CRITERIA = ["date created", "title", "rarity", "value"]
+SORT_DIRECTION = ["ascending", "descending"]
 RARITIES = {
     "common": 1,
     "uncommon": 2,
@@ -38,8 +40,8 @@ def item_list(request):
     context = {
         "page_obj": page_obj,
         "rarity_dict": rarity_dict,
-        "sorting_dict": get_sort_criteria(request),
-        "sort_direction": get_sort_direction(request),
+        "sorting_dict": get_sort_parameters(request, "order", SORT_CRITERIA),
+        "sort_direction": get_sort_parameters(request, "direction", SORT_DIRECTION),
         "path_without_page": path_without_page(request),
     }
 
