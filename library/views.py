@@ -28,7 +28,7 @@ def item_list(request):
     for r in RARITIES:
         rarity_dict[r] = request.GET.get(r, None)
 
-    items = Item.get_queryset(request)
+    items = Item.get_queryset(request, rarity_dict)
     items = Item.sort_queryset(request, items)
 
     paginator = Paginator(items, ITEMS_PER_PAGE)

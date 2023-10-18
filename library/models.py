@@ -1,10 +1,10 @@
-from operator import attrgetter
-
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+
+from library import helpers
 
 
 class Item(models.Model):
@@ -49,44 +49,26 @@ class Item(models.Model):
     def get_absolute_url(self):
         return reverse("library:item-detail", args=[self.id])
 
-    def get_queryset(request):
-        RARITIES = {
-            "common": 1,
-            "uncommon": 2,
-            "rare": 3,
-            "very rare": 4,
-            "legendary": 5,
-            "artifact": 6,
-        }
+    def get_queryset(request, rarity_dict):
         FILTERS = {
             "title__icontains": request.GET.get("title"),
             "value__gte": request.GET.get("min_value"),
             "value__lte": request.GET.get("max_value"),
         }
 
+        filters = helpers.prep_filters(FILTERS)
         # Always make sure user gets only his items
-        filters = {"date_created__lte": timezone.now(), "author": request.user}
-
-        checkbox_filters = []
-
-        for k, v in FILTERS.items():  # Prepare dict for filtering based on GET criteria
-            if v:
-                filters[k] = v
+        filters.update({"date_created__lte": timezone.now(), "author": request.user})
 
         # Filter items based on GET criteria
-        items = list(Item.objects.filter(**filters))
+        items = Item.objects.filter(**filters)
 
-        for k in RARITIES:  # Get all activated rarity checkboxes
-            checkbox = request.GET.get(k)
-            if checkbox:
-                checkbox_filters.append(RARITIES[k])
+        # If every checkbox is blank do not apply filters
+        if not any(rarity_dict.values()):
+            return items
+        else:
+            items = helpers.exclude_unchecked_rarities(items, rarity_dict)
 
-        if checkbox_filters:
-            filtered_items = []
-            for i in items:
-                if i.rarity in checkbox_filters:
-                    filtered_items.append(i)
-            return filtered_items
         return items
 
     def sort_queryset(request, q):
@@ -99,13 +81,7 @@ class Item(models.Model):
         order = order.replace(" ", "_")
         order_direction = DIRECTION_MAPPING[order_direction]
 
-        sorted_items = sorted(
-            q,
-            key=attrgetter(order),
-            reverse=True if order_direction else False,
-        )
-
-        return sorted_items
+        return q.order_by(order_direction + order)
 
 
 class Spell(models.Model):
