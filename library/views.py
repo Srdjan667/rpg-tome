@@ -6,7 +6,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
 from .forms import ItemsForm, SpellsForm
-from .helpers import get_sort_parameters, path_without_page
+from .helpers import get_rarity_checkboxes, get_sort_parameters, path_without_page
 from .models import Item, Spell
 
 ITEMS_PER_PAGE = 10
@@ -24,12 +24,7 @@ RARITIES = {
 
 @login_required
 def item_list(request):
-    rarity_dict = {}
-
-    # Make a dict of all checked out rarity checkboxes
-    for r in RARITIES:
-        rarity_dict[r] = request.GET.get(r, None)
-
+    rarity_dict = get_rarity_checkboxes(request, RARITIES)
     items = Item.get_queryset(request, rarity_dict)
     items = Item.sort_queryset(request, items)
 

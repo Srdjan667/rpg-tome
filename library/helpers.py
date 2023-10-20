@@ -50,3 +50,12 @@ def exclude_unchecked_rarities(items, rarity_dict):
         if v is None:
             items = items.exclude(rarity=rarity_value[k])
     return items
+
+
+def get_rarity_checkboxes(request, RARITIES):
+    rarity_dict = {}
+
+    # Make a dict of all checked out rarity checkboxes
+    for r in RARITIES:
+        rarity_dict[r] = request.GET.get(r, None)
+    return rarity_dict
