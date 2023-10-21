@@ -19,7 +19,7 @@
 
 <div class="container">
   <!-- Generates list of spells on current page -->
-  {% for spell in spells %}
+  {% for spell in page_obj %}
   <a href="{{ spell.get_absolute_url }}" class="list-group-item list-group-item-action">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">{{ spell.title }}</h5>
@@ -31,4 +31,26 @@
   </a>
   {% endfor %}
 </div>
+
+<div class="container mb-3">
+  <div class="paginated">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+      <!-- Generate correct URL, depending on if there are parameters present or not -->
+      <a href="{{ path_without_page }}&amp;page=1">&laquo; first</a>
+      <a href="{{ path_without_page }}&amp;page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
+    </span>
+
+    <span class="current">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+
+    {% if page_obj.has_next %}
+    <a href="{{ path_without_page }}&amp;page={{ page_obj.next_page_number }}">next</a>
+    <a href="{{ path_without_page }}&amp;page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
+  </div>
+</div>
+
 {% endblock content %}

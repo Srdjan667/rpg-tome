@@ -10,6 +10,7 @@ from .helpers import get_rarity_checkboxes, get_sort_parameters, path_without_pa
 from .models import Item, Spell
 
 ITEMS_PER_PAGE = 10
+SPELLS_PER_PAGE = 10
 SORT_CRITERIA = ["date created", "title", "rarity", "value"]
 SORT_DIRECTION = ["ascending", "descending"]
 RARITIES = {
@@ -99,8 +100,14 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 @login_required
 def spell_list(request):
     spells = Spell.objects.filter(author=request.user).order_by("-date_created")
+
+    paginator = Paginator(spells, SPELLS_PER_PAGE)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        "spells": spells,
+        "page_obj": page_obj,
+        "path_without_page": path_without_page(request),
     }
 
     return render(request, "library/spells/spell_list.html", context)
