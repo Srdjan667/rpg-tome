@@ -29,7 +29,7 @@ After installing requirements, you can run the testing server from root folder:
 
     python manage.py runserver
 
-After that you should be able to see webpage in your browser by entering the following adress:
+After that you should be able to see webpage in your browser by entering the following address:
 
     localhost:8000/
 
