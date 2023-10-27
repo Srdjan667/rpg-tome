@@ -46,15 +46,3 @@ You know your server is running succesfully when text similar to the one below a
     Django version 4.1.5, using settings 'RPG_Tome.settings'
     Starting development server at http://127.0.0.1:8000/
     Quit the server with CTRL-BREAK.
-
-# Features
-For now there are only few features, which are:
-1. Register
-2. Login and Logout
-3. Index page where you can view your items
-4. Ability to create your own items
-5. Ability to sort items
-6. Ability to view individual item in greater detail
-7. Delete items
-8. Filtering
-9. Reseting password from login page
