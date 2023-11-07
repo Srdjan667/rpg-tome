@@ -5,27 +5,19 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
-from .forms import ItemsForm, SpellsForm
+from .forms import ItemsForm, SpellFilterForm, SpellsForm
 from .helpers import get_rarity_checkboxes, get_sort_parameters, path_without_page
-from .models import Item, Spell
+from .models import ITEM_RARITY_MAP, Item, Spell
 
 ITEMS_PER_PAGE = 10
 SPELLS_PER_PAGE = 10
 SORT_CRITERIA = ["date created", "title", "rarity", "value"]
 SORT_DIRECTION = ["ascending", "descending"]
-RARITIES = {
-    "common": 1,
-    "uncommon": 2,
-    "rare": 3,
-    "very rare": 4,
-    "legendary": 5,
-    "artifact": 6,
-}
 
 
 @login_required
 def item_list(request):
-    rarity_dict = get_rarity_checkboxes(request, RARITIES)
+    rarity_dict = get_rarity_checkboxes(request, ITEM_RARITY_MAP)
     items = Item.get_queryset(request, rarity_dict)
     items = Item.sort_queryset(request, items)
 
@@ -99,13 +91,21 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 @login_required
 def spell_list(request):
-    spells = Spell.objects.filter(author=request.user).order_by("-date_created")
+    form = SpellFilterForm(request.GET)
+
+    if form.is_valid():
+        spells = Spell.get_queryset(request, form.cleaned_data)
+    else:
+        spells = Spell.objects.all()
+
+    spells = spells.order_by("-date_created")
 
     paginator = Paginator(spells, SPELLS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {
+        "form": form,
         "page_obj": page_obj,
         "path_without_page": path_without_page(request),
     }

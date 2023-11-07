@@ -6,6 +6,15 @@ from django.utils import timezone
 
 from library import helpers
 
+ITEM_RARITY_MAP = {
+    "common": 1,
+    "uncommon": 2,
+    "rare": 3,
+    "very rare": 4,
+    "legendary": 5,
+    "artifact": 6,
+}
+
 
 class Item(models.Model):
     """
@@ -67,7 +76,9 @@ class Item(models.Model):
         if not any(rarity_dict.values()):
             return items
         else:
-            items = helpers.exclude_unchecked_rarities(items, rarity_dict)
+            items = helpers.exclude_unchecked_rarities(
+                items, rarity_dict, ITEM_RARITY_MAP
+            )
 
         return items
 
@@ -100,7 +111,7 @@ class Spell(models.Model):
         (ABJURATION, "Abjuration"),
         (CONJURATION, "Conjuration"),
         (DIVINATION, "Divination"),
-        (ENCHANTMENT, "Divination"),
+        (ENCHANTMENT, "Enchantment"),
         (EVOCATION, "Evocation"),
         (ILLUSION, "Illusion"),
         (NECROMANCY, "Necromancy"),
@@ -141,3 +152,29 @@ class Spell(models.Model):
 
     def get_absolute_url(self):
         return reverse("library:spell-detail", args=[self.id])
+
+    def get_queryset(request, data):
+        filters = {
+            "title__icontains": data["title"],
+            "date_created__lte": timezone.now(),
+            "author": request.user,
+        }
+
+        # Also filter by these if present in form
+        if data["school"]:
+            filters.update(
+                {
+                    "school__in": data["school"],
+                }
+            )
+        if data["level"]:
+            filters.update(
+                {
+                    "level__in": data["level"],
+                }
+            )
+
+        # Filter spells based on data
+        spells = Spell.objects.filter(**filters)
+
+        return spells
