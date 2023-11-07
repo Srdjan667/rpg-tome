@@ -1,6 +1,48 @@
 {% extends 'library/base.html' %}
 {% load static %}
 {% block content %}
+
+<!-- Filter form -->
+<div class="container">
+  <form method="GET">
+    <div class="form-group">
+      {{ form.title }}
+    </div>
+
+    <div class="form-row">
+      <!-- Generates rarity checkboxes -->
+      {% for field in form.school %}
+      <div class="form-group mr-2">
+        <div class="form-check">
+          {{ field }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-row">
+      <!-- Generates rarity checkboxes -->
+      {% for field in form.level %}
+      <div class="form-group mr-2">
+        <div class="form-check">
+          {{ field }}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+        <!-- Clears all previously filled fields -->
+        <a href="{% url 'library:item-list' %}">
+          <button type="button" name="reset" class="btn btn-primary">Reset</button>
+        </a>
+      </div>
+    </div>
+  </form>
+</div>
+
 <div class="container">
   {% if messages %}
     {% for message in messages %}
