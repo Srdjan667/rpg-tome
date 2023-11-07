@@ -86,3 +86,30 @@ class SpellsForm(ModelForm):
         if data is None:
             return 0
         return data
+
+
+class SpellFilterForm(forms.Form):
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={"placeholder": "Enter title here", "class": "form-control"}
+        ),
+        required=False,
+    )
+
+    school = forms.TypedMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "form-check-input"},
+        ),
+        choices=Spell.SCHOOLS_OF_MAGIC,
+        coerce=int,
+        required=False,
+    )
+
+    level = forms.TypedMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "form-check-input"},
+        ),
+        choices=Spell.SPELL_LEVELS,
+        coerce=int,
+        required=False,
+    )
