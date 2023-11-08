@@ -5,9 +5,9 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
-from .forms import ItemsForm, SpellFilterForm, SpellsForm
-from .helpers import get_rarity_checkboxes, get_sort_parameters, path_without_page
-from .models import ITEM_RARITY_MAP, Item, Spell
+from .forms import ItemFilterForm, ItemsForm, SpellFilterForm, SpellsForm
+from .helpers import get_sort_parameters, path_without_page
+from .models import Item, Spell
 
 ITEMS_PER_PAGE = 10
 SPELLS_PER_PAGE = 10
@@ -17,17 +17,22 @@ SORT_DIRECTION = ["ascending", "descending"]
 
 @login_required
 def item_list(request):
-    rarity_dict = get_rarity_checkboxes(request, ITEM_RARITY_MAP)
-    items = Item.get_queryset(request, rarity_dict)
-    items = Item.sort_queryset(request, items)
+    form = ItemFilterForm(request.GET)
+
+    if form.is_valid():
+        items = Item.get_queryset(request, form.cleaned_data)
+        items = Item.sort_queryset(request, items)
+    else:
+        items = Item.objects.all()
+        items = Item.sort_queryset(request, items)
 
     paginator = Paginator(items, ITEMS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {
+        "form": form,
         "page_obj": page_obj,
-        "rarity_dict": rarity_dict,
         "sorting_dict": get_sort_parameters(request, "order", SORT_CRITERIA),
         "sort_direction": get_sort_parameters(request, "direction", SORT_DIRECTION),
         "path_without_page": path_without_page(request),
