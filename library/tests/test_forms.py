@@ -1,13 +1,13 @@
 from django.test import TestCase
 
-from library.forms import ItemsForm, SpellsForm
+from library import forms as library_forms
 
 RARITIES = ["Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Artifact"]
 
 
 class ItemsFormTest(TestCase):
     def test_empty_form(self):
-        form = ItemsForm()
+        form = library_forms.ItemsForm()
 
         self.assertInHTML(
             '<input type="text" name="title" placeholder="Enter title here" autofocus required id="id_title">',
@@ -35,37 +35,37 @@ class ItemsFormTest(TestCase):
             "value": 1000,
             "rarity": 6,
         }
-        form = ItemsForm(data=form_data)
+        form = library_forms.ItemsForm(data=form_data)
 
         self.assertTrue(form.is_valid())
 
     def test_form_title_invalid(self):
         form_data = {"title": ""}
-        form = ItemsForm(data=form_data)
+        form = library_forms.ItemsForm(data=form_data)
 
         self.assertFalse(form.is_valid())
 
     def test_form_description_invalid(self):
         form_data = {"description": None}
-        form = ItemsForm(data=form_data)
+        form = library_forms.ItemsForm(data=form_data)
 
         self.assertFalse(form.is_valid())
 
     def test_form_value_invalid(self):
         form_data = {"value": -1}
-        form = ItemsForm(data=form_data)
+        form = library_forms.ItemsForm(data=form_data)
 
         self.assertFalse(form.is_valid())
 
     def test_form_rarity_invalid(self):
         form_data = {"rarity": 7}
-        form = ItemsForm(data=form_data)
+        form = library_forms.ItemsForm(data=form_data)
 
         self.assertFalse(form.is_valid())
 
     def test_default_value(self):
         form_data = {"title": "Anduril"}
-        form = ItemsForm(data=form_data)
+        form = library_forms.ItemsForm(data=form_data)
 
         form.is_valid()
 
@@ -81,7 +81,7 @@ class SpellsFormTest(TestCase):
             "school": 4,
             "level": 4,
         }
-        form = SpellsForm(data=form_data)
+        form = library_forms.SpellsForm(data=form_data)
 
         self.assertTrue(form.is_valid())
 
@@ -92,6 +92,48 @@ class SpellsFormTest(TestCase):
             "school": 4,
             "level": 4,
         }
-        form = SpellsForm(data=form_data)
+        form = library_forms.SpellsForm(data=form_data)
 
+        self.assertFalse(form.is_valid())
+
+
+class SpellFilterFormTest(TestCase):
+    def test_empty_form_is_valid(self):
+        form_data = {}
+        form = library_forms.SpellFilterForm(data=form_data)
+
+        self.assertTrue(form.is_valid())
+
+    def test_form_is_valid(self):
+        form_data = {
+            "title": "sword",
+            "school": [1, 4, 7],
+            "level": [7, 4, 1],
+        }
+        form = library_forms.SpellFilterForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_form_only_accepts_list_of_integers(self):
+        form_data = {
+            "school": [1, 4, 7],
+        }
+        form = library_forms.SpellFilterForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        form_data = {
+            "school": ["elementary", 4, 7],
+        }
+        form = library_forms.SpellFilterForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+        form_data = {
+            "school": [5.56, 4, 7],
+        }
+        form = library_forms.SpellFilterForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+        form_data = {
+            "school": 7,
+        }
+        form = library_forms.SpellFilterForm(data=form_data)
         self.assertFalse(form.is_valid())
