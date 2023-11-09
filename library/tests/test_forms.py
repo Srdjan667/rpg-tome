@@ -73,6 +73,43 @@ class ItemsFormTest(TestCase):
         self.assertEqual(form.cleaned_data["value"], 0)
 
 
+class ItemFilterFormTest(TestCase):
+    def test_empty_form_is_valid(self):
+        form_data = {}
+        form = library_forms.ItemFilterForm(data=form_data)
+
+        self.assertTrue(form.is_valid())
+
+    def test_form_is_valid(self):
+        form_data = {
+            "title": "sword",
+            "min_value": 0,
+            "max_value": 1000,
+            "rarity": [1, 4, 5],
+        }
+        form = library_forms.ItemFilterForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_min_value_is_zero(self):
+        form_data = {
+            "min_value": 0,
+        }
+        form = library_forms.ItemFilterForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        form_data = {
+            "min_value": 1000,
+        }
+        form = library_forms.ItemFilterForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+        form_data = {
+            "min_value": -10,
+        }
+        form = library_forms.ItemFilterForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+
 class SpellsFormTest(TestCase):
     def test_form_is_valid(self):
         form_data = {
