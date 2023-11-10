@@ -42,6 +42,39 @@ class ItemsForm(ModelForm):
         return data
 
 
+class ItemFilterForm(forms.Form):
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={"placeholder": "Enter title here", "class": "form-control"},
+        ),
+        required=False,
+    )
+
+    min_value = forms.IntegerField(
+        widget=forms.NumberInput(
+            attrs={"placeholder": "Min value", "class": "form-control"},
+        ),
+        min_value=0,
+        required=False,
+    )
+
+    max_value = forms.IntegerField(
+        widget=forms.NumberInput(
+            attrs={"placeholder": "Max value", "class": "form-control"},
+        ),
+        required=False,
+    )
+
+    rarity = forms.TypedMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "form-check-input"},
+        ),
+        choices=Item.RARITIES,
+        coerce=int,
+        required=False,
+    )
+
+
 class SpellsForm(ModelForm):
     title = forms.CharField(
         widget=forms.TextInput(
@@ -86,3 +119,30 @@ class SpellsForm(ModelForm):
         if data is None:
             return 0
         return data
+
+
+class SpellFilterForm(forms.Form):
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={"placeholder": "Enter title here", "class": "form-control"}
+        ),
+        required=False,
+    )
+
+    school = forms.TypedMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "form-check-input"},
+        ),
+        choices=Spell.SCHOOLS_OF_MAGIC,
+        coerce=int,
+        required=False,
+    )
+
+    level = forms.TypedMultipleChoiceField(
+        widget=forms.CheckboxSelectMultiple(
+            attrs={"class": "form-check-input"},
+        ),
+        choices=Spell.SPELL_LEVELS,
+        coerce=int,
+        required=False,
+    )

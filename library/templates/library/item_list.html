@@ -4,29 +4,28 @@
 <div class="container">
   <form method="GET">
     <div class="form-group">
-      <input type="text" class="form-control" placeholder="Title" name="title" {% if request.GET.title %}value="{{ request.GET.title }}"{% endif %} />
+      {{ form.title }}
     </div>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <input type="number" class="form-control" min="0" placeholder="Min value" name="min_value" {% if request.GET.min_value %}value="{{ request.GET.min_value }}"{% endif %} />
+        {{ form.min_value }}
       </div>
       <div class="form-group col-md-6">
-        <input type="number" class="form-control" max="9999999999" placeholder="Max value" name="max_value" {% if request.GET.max_value %}value="{{ request.GET.max_value }}"{% endif %} />
+        {{ form.max_value }}
       </div>
     </div>
     <div class="form-row">
       <!-- Generates rarity checkboxes -->
-      {% for k, v in rarity_dict.items %}
+      {% for field in form.rarity %}
       <div class="form-group mr-2">
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="{{ k }}" {% if v %}checked{% endif %} />
-          <label for="{{ k }}">{{ k|title }} </label>
+          {{ field }}
         </div>
       </div>
       {% endfor %}
     </div>
     <div class="form-row">
-      <div class="form-group">
+      <div class="form-group pr-5">
       {% for k, v in sorting_dict.items %}
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="order" id="{{ k }}" value="{{ k }}" {% if v %}checked{% endif %} />
@@ -34,7 +33,7 @@
         </div>
       {% endfor %}
       </div>
-      <div class="form-group pl-5">
+      <div class="form-group">
         {% for k,v in sort_direction.items %}
         <div class="form-check form-check-inline">
           <input class="form-check-input" type="radio" name="direction" id="{{ k }}" value="{{ k }}" {% if v %}checked{% endif %} />

@@ -71,7 +71,7 @@ class ItemLibraryViewsTest(TestCase):
         self.assertNotIn(self.objs[2].description, response_content)
 
     def test_item_list_view_is_filter_working(self):
-        form_data = {"submit": "", "rare": "on"}
+        form_data = {"submit": "", "rarity": 3}
 
         response = self.client.get(reverse("library:item-list"), data=form_data)
         response_content = str(response.content)
