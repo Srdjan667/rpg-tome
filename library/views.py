@@ -5,36 +5,49 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
-from .forms import ItemFilterForm, ItemsForm, SpellFilterForm, SpellsForm
-from .helpers import get_sort_parameters, path_without_page
+from .forms import ItemFilterForm, ItemsForm, ItemSortForm, SpellFilterForm, SpellsForm
+from .helpers import path_without_page
 from .models import Item, Spell
 
 ITEMS_PER_PAGE = 10
 SPELLS_PER_PAGE = 10
-SORT_CRITERIA = ["date created", "title", "rarity", "value"]
-SORT_DIRECTION = ["ascending", "descending"]
 
 
 @login_required
 def item_list(request):
-    form = ItemFilterForm(request.GET)
+    filter_form = ItemFilterForm()
+    sorting_form = ItemSortForm()
 
-    if form.is_valid():
-        items = Item.get_queryset(request, form.cleaned_data)
-        items = Item.sort_queryset(request, items)
+    if "submit" in request.GET:
+        filter_form = ItemFilterForm(request.GET)
+        sorting_form = ItemSortForm(request.GET)
+
+        if filter_form.is_valid():
+            data = filter_form.cleaned_data
+            items = Item.get_queryset(request, data)
+        else:
+            items = Item.get_queryset(request)
+            messages.error(request, "Filter not valid, using default.")
+
+        if sorting_form.is_valid():
+            data = sorting_form.cleaned_data
+            items = Item.sort_queryset(items, data)
+        else:
+            items = Item.sort_queryset(items)
+            messages.error(request, "Sort not valid, using default.")
+
     else:
-        items = Item.objects.all()
-        items = Item.sort_queryset(request, items)
+        items = Item.get_queryset(request)
+        items = Item.sort_queryset(items)
 
     paginator = Paginator(items, ITEMS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {
-        "form": form,
+        "filter_form": filter_form,
+        "sorting_form": sorting_form,
         "page_obj": page_obj,
-        "sorting_dict": get_sort_parameters(request, "order", SORT_CRITERIA),
-        "sort_direction": get_sort_parameters(request, "direction", SORT_DIRECTION),
         "path_without_page": path_without_page(request),
     }
 

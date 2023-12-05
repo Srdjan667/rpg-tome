@@ -48,6 +48,7 @@ class ItemFilterForm(forms.Form):
             attrs={"placeholder": "Enter title here", "class": "form-control"},
         ),
         required=False,
+        initial="",
     )
 
     min_value = forms.IntegerField(
@@ -73,6 +74,32 @@ class ItemFilterForm(forms.Form):
         coerce=int,
         required=False,
     )
+
+
+class ItemSortForm(forms.Form):
+    sort_criteria = forms.ChoiceField(
+        choices=Item.SORT_CRITERIA,
+        required=False,
+    )
+
+    sort_direction = forms.ChoiceField(
+        choices=Item.SORT_DIRECTION,
+        required=False,
+    )
+
+    def clean_sort_criteria(self):
+        data = self.cleaned_data["sort_criteria"]
+        for criteria in Item.SORT_CRITERIA:
+            if data == criteria[0]:
+                return data
+        return "date_created"
+
+    def clean_sort_direction(self):
+        data = self.cleaned_data["sort_direction"]
+        for direction in Item.SORT_DIRECTION:
+            if data == direction[0]:
+                return data
+        return "desc"
 
 
 class SpellsForm(ModelForm):

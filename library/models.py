@@ -4,14 +4,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
-ITEM_RARITY_MAP = {
-    "common": 1,
-    "uncommon": 2,
-    "rare": 3,
-    "very rare": 4,
-    "legendary": 5,
-    "artifact": 6,
-}
+ITEM_DEFAULT_SORTING = "-date_created"
+SORT_DIRECTION_DICT = {"asc": "", "desc": "-"}
 
 
 class Item(models.Model):
@@ -37,6 +31,18 @@ class Item(models.Model):
         (ARTIFACT, "Artifact"),
     )
 
+    SORT_CRITERIA = (
+        ("date_created", "Date created"),
+        ("title", "Title"),
+        ("rarity", "Rarity"),
+        ("value", "Value"),
+    )
+
+    SORT_DIRECTION = (
+        ("asc", "Ascending"),
+        ("desc", "Descending"),
+    )
+
     title = models.CharField(max_length=100)
     description = models.TextField(null=True)
     value = models.PositiveIntegerField(default=0, null=True)
@@ -56,37 +62,39 @@ class Item(models.Model):
     def get_absolute_url(self):
         return reverse("library:item-detail", args=[self.id])
 
-    def get_queryset(request, data):
+    def get_queryset(request, data=None):
+        # By default user will get only his items
         filters = {
-            "title__icontains": data["title"],
             "date_created__lte": timezone.now(),
             "author": request.user,
         }
 
-        # Also filter by these if present in form
-        if data["min_value"]:
-            filters.update({"value__gte": data["min_value"]})
-        if data["max_value"]:
-            filters.update({"value__lte": data["max_value"]})
-        if data["rarity"]:
-            filters.update({"rarity__in": data["rarity"]})
+        if data:
+            # Also filter by these if present in form
+            if data["title"]:
+                filters.update({"title__icontains": data["title"]})
+            if data["min_value"]:
+                filters.update({"value__gte": data["min_value"]})
+            if data["max_value"]:
+                filters.update({"value__lte": data["max_value"]})
+            if data["rarity"]:
+                filters.update({"rarity__in": data["rarity"]})
 
         # Filter items based on GET criteria
         items = Item.objects.filter(**filters)
 
         return items
 
-    def sort_queryset(request, q):
-        DIRECTION_MAPPING = {"ascending": "", "descending": "-"}
+    # Sort queryset based on given parameters
+    def sort_queryset(q, data=None):
+        if data:
+            sort_direction = SORT_DIRECTION_DICT[data["sort_direction"]]
+            sort_criteria = data["sort_criteria"]
 
-        # Gets order criteria from URL
-        order = request.GET.get("order", "date_created")
-        order_direction = request.GET.get("direction", "descending")
+            order = sort_direction + sort_criteria
+            return q.order_by(order)
 
-        order = order.replace(" ", "_")
-        order_direction = DIRECTION_MAPPING[order_direction]
-
-        return q.order_by(order_direction + order)
+        return q.order_by(ITEM_DEFAULT_SORTING)
 
 
 class Spell(models.Model):

@@ -2,56 +2,59 @@
 {% load static %}
 {% block content %}
 <div class="container">
-  <form method="GET">
-    <div class="form-group">
-      {{ form.title }}
-    </div>
-    <div class="form-row">
-      <div class="form-group col-md-6">
-        {{ form.min_value }}
-      </div>
-      <div class="form-group col-md-6">
-        {{ form.max_value }}
-      </div>
-    </div>
-    <div class="form-row">
-      <!-- Generates rarity checkboxes -->
-      {% for field in form.rarity %}
-      <div class="form-group mr-2">
-        <div class="form-check">
-          {{ field }}
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    <div class="form-row">
-      <div class="form-group pr-5">
-      {% for k, v in sorting_dict.items %}
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="order" id="{{ k }}" value="{{ k }}" {% if v %}checked{% endif %} />
-          <label class="form-check-label" for="{{ k }}">{{ k|title }}</label>
-        </div>
-      {% endfor %}
-      </div>
+  <div class="container mt-3">
+    <button class="btn btn-primary mb-3" type="button" data-toggle="collapse" data-target="#filter" aria-expanded="false" aria-controls="filter">
+      Filter
+    </button>
+  </div>
+
+  <div class="collapse container" id="filter">
+    <form method="GET">
       <div class="form-group">
-        {% for k,v in sort_direction.items %}
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="direction" id="{{ k }}" value="{{ k }}" {% if v %}checked{% endif %} />
-          <label class="form-check-label" for="{{ k }}">{{ k|title }}</label>
+        {{ filter_form.title }}
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          {{ filter_form.min_value }}
+        </div>
+        <div class="form-group col-md-6">
+          {{ filter_form.max_value }}
+        </div>
+      </div>
+      <div class="form-row">
+        <!-- Generates rarity checkboxes -->
+        {% for field in filter_form.rarity %}
+        <div class="form-group mr-2">
+          <div class="form-check">
+            {{ field }}
+          </div>
         </div>
         {% endfor %}
       </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
-        <!-- Clears all previously filled fields -->
-        <a href="{% url 'library:item-list' %}">
-          <button type="button" name="reset" class="btn btn-primary">Reset</button>
-        </a>
+      <div class="form-row">
+        <div class="form-group mr-2">
+          {{ sorting_form.sort_criteria }}
+        </div>
+        <div class="form-group mr-2">
+          {{ sorting_form.sort_direction }}
+        </div>
       </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+          <!-- Clears all previously filled fields -->
+          <a href="{% url 'library:item-list' %}">
+            <button type="button" name="reset" class="btn btn-primary">Reset</button>
+          </a>
+        </div>
+      </div>
+    </form>
     </div>
-  </form>
+  </div>
+</div>
+
+<div class="container">
   {% if messages %}
     {% for message in messages %}
       {% if message.tags == 'success' %}
@@ -66,42 +69,44 @@
     {% endfor %}
   {% endif %}
 </div>
-<div class="row">
-  <div class="container">
-    <div class="list-group">
-      <!-- Generates list of items on current page -->
-      {% for item in page_obj %}
-      <a href="{{ item.get_absolute_url }}" class="list-group-item list-group-item-action">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">{{ item.title }}</h5>
-          <small>{{ item.get_rarity_display }} </small>
-        </div>
-        <p class="mb-1">{{ item.description }}</p>
-        <div class="d-flex w-100 justify-content-between">
-          <small>{{ item.date_created }} </small>
-        </div>
-      </a>
-      {% endfor %}
-    </div>
 
-    <div class="paginated">
-      <span class="step-links">
-        {% if page_obj.has_previous %}
-        <!-- Generate correct URL, depending on if there are parameters present or not -->
-        <a href="{{ path_without_page }}&amp;page=1">&laquo; first</a>
-        <a href="{{ path_without_page }}&amp;page={{ page_obj.previous_page_number }}">previous</a>
+<div>
+  <div class="row">
+    <div class="container">
+      <div class="list-group">
+        <!-- Generates list of items on current page -->
+        {% for item in page_obj %}
+        <a href="{{ item.get_absolute_url }}" class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ item.title }}</h5>
+            <small>{{ item.get_rarity_display }} </small>
+          </div>
+          <p class="mb-1">{{ item.description }}</p>
+          <div class="d-flex w-100 justify-content-between">
+            <small>{{ item.date_created }} </small>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+
+      <div class="paginated">
+        <span class="step-links">
+          {% if page_obj.has_previous %}
+          <!-- Generate correct URL, depending on if there are parameters present or not -->
+          <a href="{{ path_without_page }}&amp;page=1">&laquo; first</a>
+          <a href="{{ path_without_page }}&amp;page={{ page_obj.previous_page_number }}">previous</a>
+          {% endif %}
+        </span>
+
+        <span class="current">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+        <a href="{{ path_without_page }}&amp;page={{ page_obj.next_page_number }}">next</a>
+        <a href="{{ path_without_page }}&amp;page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
         {% endif %}
-      </span>
-
-      <span class="current">
-        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-      </span>
-
-      {% if page_obj.has_next %}
-      <a href="{{ path_without_page }}&amp;page={{ page_obj.next_page_number }}">next</a>
-      <a href="{{ path_without_page }}&amp;page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-      {% endif %}
+      </div>
     </div>
   </div>
-</div>
 {% endblock content %}
