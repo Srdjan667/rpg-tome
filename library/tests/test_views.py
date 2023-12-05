@@ -51,19 +51,25 @@ class ItemLibraryViewsTest(TestCase):
         self.assertTrue(self.login_successful)
 
     def test_item_list_view_response(self):
-        response = self.client.get(reverse("library:item-list"))
+        form_data = {"submit": ""}
+
+        response = self.client.get(reverse("library:item-list"), data=form_data)
 
         self.assertEqual(200, response.status_code)
 
     def test_item_list_view_is_item_displayed(self):
-        response = self.client.get(reverse("library:item-list"))
+        form_data = {"submit": ""}
+
+        response = self.client.get(reverse("library:item-list"), data=form_data)
         response_content = str(response.content)
 
         self.assertIn(self.objs[0].title, response_content)
         self.assertIn(self.objs[0].description, response_content)
 
     def test_item_list_view_is_future_item_displayed(self):
-        response = self.client.get(reverse("library:item-list"))
+        form_data = {"submit": ""}
+
+        response = self.client.get(reverse("library:item-list"), data=form_data)
         response_content = str(response.content)
 
         # Items whose date_created is in future should not be displayed
@@ -126,7 +132,11 @@ class ItemLibrarySortingTest(TestCase):
 
     def test_index_view_is_date_created_order_working(self):
         # Simulate user sorting items by the time they were created
-        form_data = {"submit": "", "order": "date_created", "direction": "ascending"}
+        form_data = {
+            "submit": "",
+            "sort_criteria": "date_created",
+            "sort_direction": "asc",
+        }
         response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("date_created")
@@ -137,7 +147,7 @@ class ItemLibrarySortingTest(TestCase):
 
     def test_index_view_is_title_order_working(self):
         # Simulate user sorting items by their titles
-        form_data = {"submit": "", "order": "title", "direction": "ascending"}
+        form_data = {"submit": "", "sort_criteria": "title", "sort_direction": "asc"}
         response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("title")
@@ -148,7 +158,7 @@ class ItemLibrarySortingTest(TestCase):
 
     def test_index_view_is_rarity_order_working(self):
         # Simulate user sorting items by their rarities
-        form_data = {"submit": "", "order": "rarity", "direction": "ascending"}
+        form_data = {"submit": "", "sort_criteria": "rarity", "sort_direction": "asc"}
         response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("rarity")
@@ -159,7 +169,7 @@ class ItemLibrarySortingTest(TestCase):
 
     def test_index_view_is_value_order_working(self):
         # Simulate user sorting items by their values
-        form_data = {"submit": "", "order": "value", "direction": "ascending"}
+        form_data = {"submit": "", "sort_criteria": "value", "sort_direction": "asc"}
         response = self.get_response(form_data)
 
         database_items = self.fetch_items_from_database("value")
