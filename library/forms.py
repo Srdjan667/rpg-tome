@@ -173,3 +173,29 @@ class SpellFilterForm(forms.Form):
         coerce=int,
         required=False,
     )
+
+
+class SpellSortForm(forms.Form):
+    sort_criteria = forms.ChoiceField(
+        choices=Spell.SORT_CRITERIA,
+        required=False,
+    )
+
+    sort_direction = forms.ChoiceField(
+        choices=Spell.SORT_DIRECTION,
+        required=False,
+    )
+
+    def clean_sort_criteria(self):
+        data = self.cleaned_data["sort_criteria"]
+        for criteria in Spell.SORT_CRITERIA:
+            if data == criteria[0]:
+                return data
+        return "date_created"
+
+    def clean_sort_direction(self):
+        data = self.cleaned_data["sort_direction"]
+        for direction in Spell.SORT_DIRECTION:
+            if data == direction[0]:
+                return data
+        return "desc"

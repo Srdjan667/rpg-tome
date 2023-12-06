@@ -133,6 +133,18 @@ class Spell(models.Model):
         (9, "9th"),
     )
 
+    SORT_CRITERIA = (
+        ("date_created", "Date created"),
+        ("title", "Title"),
+        ("school", "School"),
+        ("level", "Level"),
+    )
+
+    SORT_DIRECTION = (
+        ("asc", "Ascending"),
+        ("desc", "Descending"),
+    )
+
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, default="")
     school = models.PositiveSmallIntegerField(
@@ -155,20 +167,36 @@ class Spell(models.Model):
     def get_absolute_url(self):
         return reverse("library:spell-detail", args=[self.id])
 
-    def get_queryset(request, data):
+    def get_queryset(request, data=None):
         filters = {
-            "title__icontains": data["title"],
             "date_created__lte": timezone.now(),
             "author": request.user,
         }
+        print("Data", data)
+        data["school"]
+        # print(f"Data type of school is {type(x)}")
 
-        # Also filter by these if present in form
-        if data["school"]:
-            filters.update({"school__in": data["school"]})
-        if data["level"]:
-            filters.update({"level__in": data["level"]})
+        if data:
+            # Also filter by these if present in form
+            if data["title"]:
+                filters.update({"title__icontains": data["title"]})
+            if data["school"]:
+                filters.update({"school__in": data["school"]})
+            if data["level"]:
+                filters.update({"level__in": data["level"]})
 
         # Filter spells based on data
         spells = Spell.objects.filter(**filters)
 
         return spells
+
+    # Sort queryset based on given parameters
+    def sort_queryset(q, data=None):
+        if data:
+            sort_direction = SORT_DIRECTION_DICT[data["sort_direction"]]
+            sort_criteria = data["sort_criteria"]
+
+            order = sort_direction + sort_criteria
+            return q.order_by(order)
+
+        return q.order_by(ITEM_DEFAULT_SORTING)

@@ -6,12 +6,12 @@
 <div class="container">
   <form method="GET">
     <div class="form-group">
-      {{ form.title }}
+      {{ filter_form.title }}
     </div>
 
     <div class="form-row">
       <!-- Generates rarity checkboxes -->
-      {% for field in form.school %}
+      {% for field in filter_form.school %}
       <div class="form-group mr-2">
         <div class="form-check">
           {{ field }}
@@ -22,13 +22,23 @@
 
     <div class="form-row">
       <!-- Generates rarity checkboxes -->
-      {% for field in form.level %}
+      {% for field in filter_form.level %}
       <div class="form-group mr-2">
         <div class="form-check">
           {{ field }}
         </div>
       </div>
       {% endfor %}
+    </div>
+
+    <div class="form-row">
+      <!-- Generates rarity checkboxes -->
+      <div class="form-group mr-2">
+        {{ sorting_form.sort_criteria }}
+      </div>
+      <div class="form-group mr-2">
+        {{ sorting_form.sort_direction }}
+      </div>
     </div>
 
     <div class="form-row">

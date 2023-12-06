@@ -5,7 +5,14 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render
 from django.views.generic import DeleteView, DetailView, UpdateView
 
-from .forms import ItemFilterForm, ItemsForm, ItemSortForm, SpellFilterForm, SpellsForm
+from .forms import (
+    ItemFilterForm,
+    ItemsForm,
+    ItemSortForm,
+    SpellFilterForm,
+    SpellsForm,
+    SpellSortForm,
+)
 from .helpers import path_without_page
 from .models import Item, Spell
 
@@ -109,21 +116,38 @@ class ItemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 @login_required
 def spell_list(request):
-    form = SpellFilterForm(request.GET)
+    filter_form = SpellFilterForm()
+    sorting_form = SpellSortForm()
 
-    if form.is_valid():
-        spells = Spell.get_queryset(request, form.cleaned_data)
+    if "submit" in request.GET:
+        filter_form = SpellFilterForm(request.GET)
+        sorting_form = SpellSortForm(request.GET)
+
+        if filter_form.is_valid():
+            data = filter_form.cleaned_data
+            spells = Spell.get_queryset(request, data)
+        else:
+            spells = Spell.get_queryset(request)
+            messages.error(request, "Filter not valid, using default.")
+
+        if sorting_form.is_valid():
+            data = sorting_form.cleaned_data
+            spells = Spell.sort_queryset(spells, data)
+        else:
+            spells = Spell.sort_queryset(spells)
+            messages.error(request, "Sort not valid, using default.")
+
     else:
-        spells = Spell.objects.all()
-
-    spells = spells.order_by("-date_created")
+        spells = Spell.get_queryset(request)
+        spells = Spell.sort_queryset(spells)
 
     paginator = Paginator(spells, SPELLS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {
-        "form": form,
+        "filter_form": filter_form,
+        "sorting_form": sorting_form,
         "page_obj": page_obj,
         "path_without_page": path_without_page(request),
     }
