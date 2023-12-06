@@ -184,3 +184,8 @@ class SpellDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == entry.author:
             return True
         return False
+
+
+@login_required
+def index(request):
+    return redirect("library:item-list")

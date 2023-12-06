@@ -5,7 +5,7 @@ from library import views
 app_name = "library"
 
 urlpatterns = [
-    # path("", views.index, name="index"), # home page
+    path("", views.index, name="index"),  # home page
     path("items/", views.item_list, name="item-list"),
     path("item/new/", views.new_item, name="item-create"),
     path("item/<int:pk>/", views.ItemDetailView.as_view(), name="item-detail"),
