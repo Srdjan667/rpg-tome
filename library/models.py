@@ -172,9 +172,6 @@ class Spell(models.Model):
             "date_created__lte": timezone.now(),
             "author": request.user,
         }
-        print("Data", data)
-        data["school"]
-        # print(f"Data type of school is {type(x)}")
 
         if data:
             # Also filter by these if present in form
