@@ -174,3 +174,39 @@ class SpellFilterFormTest(TestCase):
         }
         form = library_forms.SpellFilterForm(data=form_data)
         self.assertFalse(form.is_valid())
+
+
+class SpellSortFormTest(TestCase):
+    def test_empty_form_is_valid(self):
+        form_data = {}
+        form = library_forms.SpellSortForm(data=form_data)
+
+        self.assertTrue(form.is_valid())
+
+    def test_form_is_valid(self):
+        form_data = {
+            "sort_direction": "",
+            "sort_criteria": "",
+        }
+        form = library_forms.SpellSortForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_form_only_accepts_valid_direction(self):
+        form_data = {"sort_direction": "asc"}
+        form = library_forms.SpellSortForm(data=form_data)
+
+        self.assertTrue(form.is_valid())
+
+        form_data = {"sort_direction": "desc"}
+        form = library_forms.SpellSortForm(data=form_data)
+
+        self.assertTrue(form.is_valid())
+
+        form_data = {"sort_direction": "dummy_direction"}
+        form = library_forms.SpellSortForm(data=form_data)
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["sort_direction"][0],
+            "Select a valid choice. dummy_direction is not one of the available choices.",
+        )
