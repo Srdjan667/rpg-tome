@@ -96,15 +96,17 @@ class ItemLibrarySortingTest(TestCase):
         cls.user = User.objects.create_user(username="testuser", password="testing321")
 
         item_name = "Item"
-
+        objs = []
         # Create enough items for one page with random values
         for i in range(ITEMS_PER_PAGE):
-            Item.objects.create(
+            item = Item(
                 title=f"{item_name}{i}",
                 value=randint(1, 50000),
                 rarity=randint(1, 5),
                 author=cls.user,
             )
+            objs.append(item)
+        Item.objects.bulk_create(objs)
 
     def setUp(self):
         # Create client for interacting with view
@@ -188,15 +190,17 @@ class ItemLibraryFilteringTest(TestCase):
         cls.user = User.objects.create_user(username="testuser", password="testing321")
 
         item_name = "Item"
-
+        objs = []
         # Create enough items for one page with random values
         for i in range(ITEMS_PER_PAGE):
-            Item.objects.create(
+            item = Item(
                 title=f"{item_name}{i}",
                 value=randint(1, 50000),
                 rarity=randint(1, 5),
                 author=cls.user,
             )
+            objs.append(item)
+        Item.objects.bulk_create(objs)
 
     def setUp(self):
         # Create client for interacting with view
