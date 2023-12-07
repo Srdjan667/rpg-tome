@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from library import forms as library_forms
+from library.models import Spell
 
 RARITIES = ["Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Artifact"]
 
@@ -209,4 +210,22 @@ class SpellSortFormTest(TestCase):
         self.assertEqual(
             form.errors["sort_direction"][0],
             "Select a valid choice. dummy_direction is not one of the available choices.",
+        )
+
+    def test_form_only_accepts_valid_criteria(self):
+        # These are criteria that are defined in model
+        for criteria in Spell.SORT_CRITERIA:
+            form_data = {"sort_criteria": criteria[0]}
+            form = library_forms.SpellSortForm(data=form_data)
+
+            self.assertTrue(form.is_valid())
+
+        # Make sure form rejects entries not listed in Spell.SORT_CRITERIA
+        form_data = {"sort_criteria": "random"}
+        form = library_forms.SpellSortForm(data=form_data)
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["sort_criteria"][0],
+            "Select a valid choice. random is not one of the available choices.",
         )
